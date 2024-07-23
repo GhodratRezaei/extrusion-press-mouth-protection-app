@@ -8,12 +8,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-
-    // // Set the window icon
-    QGuiApplication::setWindowIcon(QIcon(":/bin/favicon.ico"));
-
-
-
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
