@@ -73,6 +73,8 @@ CMakeLists.txt.user*
 *.exe
 
 
-mouthProtectionApp_RemoteRepository_Password (Token)/
+mouthProtectionApp_RemoteRepository_Password/
 build/
+help/
+toolsrgbEditerOpenCVmyenv/
 

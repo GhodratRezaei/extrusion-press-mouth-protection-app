@@ -30,9 +30,10 @@ background-color: rgb(43, 39, 56);
     </property>
     <property name="styleSheet">
      <string notr="true">border: 1px solid white;
+border-color: rgb(220, 220, 240);
 background-color: rgb(220, 220, 240);</string>
     </property>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="header_title">
      <property name="geometry">
       <rect>
        <x>300</x>
@@ -66,12 +67,29 @@ border-color: rgb(220, 220, 240);</string>
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QLabel" name="danieli_label">
+     <property name="geometry">
+      <rect>
+       <x>-2</x>
+       <y>0</y>
+       <width>141</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border-color: rgb(220, 220, 240);
+</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="border_widget" native="true">
     <property name="geometry">
      <rect>
       <x>29</x>
-      <y>9</y>
+      <y>10</y>
       <width>1621</width>
       <height>941</height>
      </rect>
@@ -91,7 +109,8 @@ border-color: rgb(220, 220, 240);</string>
      </property>
      <property name="styleSheet">
       <string notr="true">border: 1px solid white;
-background-color: rgb(220, 220, 240);</string>
+background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
      </property>
      <widget class="QLabel" name="footer_title">
       <property name="geometry">
@@ -164,7 +183,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(220, 220, 240);</string>
+      <string notr="true">background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
      </property>
      <widget class="QLabel" name="video_title">
       <property name="geometry">
@@ -211,7 +231,8 @@ border-color: rgb(220, 220, 240);</string>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(220, 220, 240);</string>
+      <string notr="true">background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
      </property>
      <widget class="QLabel" name="setting_title">
       <property name="geometry">
