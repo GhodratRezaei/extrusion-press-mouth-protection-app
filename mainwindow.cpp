@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // // Video Streamer
     // Load image using OpenCV
-    cv::Mat cv::img = cv::imread(":/images/logo.jpg");
+    cv::Mat img = cv::imread(":/images/logo.jpg");
     // if (img.empty()) {
     //     qWarning("Could not open or find the image.");
     //     return -1;
