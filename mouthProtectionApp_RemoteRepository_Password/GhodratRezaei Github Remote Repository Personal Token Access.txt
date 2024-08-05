@@ -1,8 +1,0 @@
-
-personal created token : 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
-
-git remote set-url GhodratRezaei https://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@github.com/GhodratRezaei/extrusion-press-mouth-protection-app
-
-https://github.com/GhodratRezaei/extrusion-press-mouth-protection-app.git
-
-
