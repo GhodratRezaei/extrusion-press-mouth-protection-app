@@ -1,0 +1,10 @@
+# Token Personal Access for the https://github.com/DanieliBreda Github repo:
+personal created token :  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                           
+
+
+# Setting the token as password credential for accessing directly to the remote repo:  "Danieli Breda is name of remote repo" in the local repo
+git remote set-url DanieliBreda https://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@github.com/DanieliBreda/extrusion-press-mouth-protection-app
+
+
+https://github.com/DanieliBreda/extrusion-press-mouth-protection-app.git     
+
