@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1680</width>
+    <height>1050</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(43, 39, 56);
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="border_widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>29</x>
+      <y>10</y>
+      <width>1621</width>
+      <height>941</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 1px solid white;
+</string>
+    </property>
+    <widget class="QWidget" name="footer_widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>830</y>
+       <width>1601</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid white;
+background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
+     </property>
+     <widget class="QLabel" name="footer_title">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
+        <y>8</y>
+        <width>271</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>19</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+      </property>
+      <property name="text">
+       <string>System Logs</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>46</y>
+        <width>1541</width>
+        <height>46</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);
+font: 10pt &quot;Segoe UI&quot;;
+border-color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;sdsdsd&lt;br /&gt;sdsdsd&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QDateTimeEdit" name="dateTimeEdit">
+      <property name="geometry">
+       <rect>
+        <x>1410</x>
+        <y>48</y>
+        <width>161</width>
+        <height>43</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>MS Shell Dlg 2</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;
+color: rgb(0, 0, 0);</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="video_widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>791</width>
+       <height>701</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
+     </property>
+     <widget class="QLabel" name="video_title">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>8</y>
+        <width>271</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>19</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+      </property>
+      <property name="text">
+       <string>Live View</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="video_label">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>60</y>
+        <width>691</width>
+        <height>641</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>put here the live video frame</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="record_label">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>630</y>
+        <width>471</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="save_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>640</y>
+        <width>75</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>9</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(0, 0, 0);
+font: 75 12pt &quot;Arial&quot;;
+</string>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="start_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>640</y>
+        <width>75</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+font: 75 12pt &quot;Arial&quot;;
+border-color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="stop_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>640</y>
+        <width>75</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+font: 75 12pt &quot;Arial&quot;;
+border-color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Stop</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pause_pushButton">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>640</y>
+        <width>75</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+font: 75 12pt &quot;Arial&quot;;
+border-color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Pause</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="setting_widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>820</x>
+       <y>110</y>
+       <width>791</width>
+       <height>701</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(220, 220, 240);
+border-color: rgb(220, 220, 240);</string>
+     </property>
+     <widget class="QLabel" name="setting_title">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>8</y>
+        <width>271</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>19</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+      </property>
+      <property name="text">
+       <string>Settings</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QFrame" name="setting_frame">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>771</width>
+        <height>641</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(220, 220, 240);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="cameraUrl_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>26</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Camera URL</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="cameraUrl_line">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="prmRecPath_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>144</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="prmRecPath_text_2">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>110</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Primary recording path</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="plcIp_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>344</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="secRecPath_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>196</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Secondary recording path (local only)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="plcIp_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>310</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>PLC IP address</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="extrusionTag_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>514</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="heartbeatTag_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>566</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Heartbeat tag</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="mouthDoorTag_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>430</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="MouthDoorTag_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>396</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Mouth door tag</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="extrusionTag_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>480</y>
+         <width>731</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>Extrusion tag</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="heartbeatTag_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>600</y>
+         <width>731</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="secRecPath_text">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>230</y>
+         <width>730</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);
+border-color: rgb(0, 0, 0);
+font: 12pt &quot;Segoe UI&quot;;</string>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;sddsdsdsd&lt;br /&gt;hjhjhj&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ukjjojkuj,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="header_widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1601</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid white;
+border-color: rgb(220, 220, 240);
+background-color: rgb(220, 220, 240);</string>
+     </property>
+     <widget class="QLabel" name="header_title_2">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>24</y>
+        <width>1000</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>28</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+      </property>
+      <property name="text">
+       <string>DANIELI PRESS MOUTH PROTECTION</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="danieli_label_2">
+      <property name="geometry">
+       <rect>
+        <x>-2</x>
+        <y>0</y>
+        <width>141</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(220, 220, 240);
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+    <zorder>video_widget</zorder>
+    <zorder>setting_widget</zorder>
+    <zorder>footer_widget</zorder>
+    <zorder>header_widget</zorder>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1680</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
