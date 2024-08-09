@@ -1,12 +1,11 @@
 ## Importing Packages
-
 # Built-in standard packages
 import sys
 import datetime
 import time
 import os
-# opencv package
 
+# opencv package
 import cv2
 
 # PyQT5 Packages
@@ -71,17 +70,23 @@ class MouthProtectionApp():
 
     def initCommunication(self):    
         self.plc_type = str(self.comboBox.currentText())
+        # Siemens PLC 
         try:        
             if (self.plc_type == "Siemens"):    
                 self.client = snap7.client.Client()
                 self.client.connect(self.plcIp_text.text(), 0, 1) 
-                print("PLC Cponnection is okay!")
+                print("Connection to Siemens PLC is okay!")
                 self.plc_connection = True
-            elif (self.plc_type == "Allen Bradly"):  
-                self.client = "Define the client python API for Allen Bradly PLC"
-                print("PLC Cponnection is okay!")
         except Exception as e:
-            print(f"Error:   {e}")            
+            print(f"Error:   {e}")  
+             
+        # Allen Bradly
+        if (self.plc_type == "Allen Bradly"):  
+            with LogixDriver(self.plcIp_text.text()) as plc:
+                if plc.connected:
+                    print("Connection to Allen Bradly PLC is okay!")
+                else:
+                    print("Failed to connect to the Allen Bradly PLC.")
             
         
         
@@ -187,6 +192,7 @@ class MouthProtectionApp():
         self.video_widget.setGeometry(QtCore.QRect(10, 110, 791, 701))
         self.video_widget.setStyleSheet(u"background-color: rgb(220, 220, 240);\n"
 "border-color: rgb(220, 220, 240);")
+        
         self.video_title = QLabel(self.video_widget)
         self.video_title.setObjectName(u"video_title")
         self.video_title.setGeometry(QtCore.QRect(260, 8, 271, 31))
@@ -196,12 +202,10 @@ class MouthProtectionApp():
         self.video_title.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.video_title.setAlignment(Qt.AlignCenter)
-        
         self.video_label = QLabel(self.video_widget)
         self.video_label.setObjectName(u"video_label")
         self.video_label.setGeometry(QtCore.QRect(50, 60, 691, 641))
         self.video_label.setStyleSheet(u"color: rgb(0, 0, 0);")
-
         self.record_label = QLabel(self.video_widget)
         self.record_label.setObjectName(u"record_label")
         self.record_label.setGeometry(QtCore.QRect(170, 630, 471, 51))
@@ -254,7 +258,7 @@ class MouthProtectionApp():
             }
         """)
         self.stop_pushButton.clicked.connect(self.__on_stop_button)
-        \
+        
         self.pause_pushButton = QPushButton(self.video_widget)
         self.pause_pushButton.setObjectName(u"pause_pushButton")
         self.pause_pushButton.setGeometry(QtCore.QRect(430, 640, 75, 31))
@@ -425,14 +429,11 @@ class MouthProtectionApp():
         self.plctype_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.plctype_label.setAlignment(Qt.AlignCenter)
-        
         self.saveConf_label = QLabel(self.setting_widget)
         self.saveConf_label.setObjectName(u"saveConf_label")
         self.saveConf_label.setGeometry(QtCore.QRect(290, 651, 201, 41))
         self.saveConf_label.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
 "color: rgb(0, 0, 0);")
-        
-        
         self.saveCong_pushButton = QPushButton(self.setting_widget)
         self.saveCong_pushButton.setObjectName(u"saveCong_pushButton")
         self.saveCong_pushButton.setGeometry(QtCore.QRect(300, 660, 181, 21))
@@ -473,12 +474,8 @@ class MouthProtectionApp():
         self.danieli_label.setObjectName(u"danieli_label")
         self.danieli_label.setGeometry(QtCore.QRect(-2, 0, 141, 81))
         self.danieli_label.setStyleSheet(u"border-color: rgb(220, 220, 240);\n")
-        
-        
         self.danieli_label.setText("")
         self.danieli_label.setObjectName("danieli_label")
-        
-        print(self.danieli_logo_image.shape)
         self.danieli_logo_image = cv2.resize(self.danieli_logo_image, (141, 81))
         logo_height, logo_width, logo_channel = self.danieli_logo_image.shape   
         logo_bytes_per_line = 3 * logo_width
@@ -501,7 +498,6 @@ class MouthProtectionApp():
         self.statusbar = QtWidgets.QStatusBar(mouthProtectionWinow)
         self.statusbar.setObjectName(u"statusbar")
         mouthProtectionWinow.setStatusBar(self.statusbar)
-
 
         self.retranslateUi(mouthProtectionWinow)
         QtCore.QMetaObject.connectSlotsByName(mouthProtectionWinow)
@@ -567,16 +563,39 @@ class MouthProtectionApp():
         self.saveConf_label.setText("")
         
 
+    # Reading Tags's Values in PLC
+    def ReadDataBlock(self, plc, data_block_number, byte, bit, size, data_type):
+        """
+        plc
+        data-block(int): number of Data Block; DB1, DB2, ...
+        byte(int): in case of 2.0, byte is 2.
+        bit(int): in case of 2.0,bit is 0.
+        size(int): The size of the db data to read  
+        data_type(variable): S7WLBit, S7WLWord, S7WLReal, S7WLDDword 
+
+        """
+        result = plc.db_read(data_block_number, byte, size)
+        if data_type == S7WLBit:
+            return get_bool(result, 0, bit)
+        elif data_type == S7WLByte or data_type == S7WLWord:
+            return get_int(result, 0)
+        elif data_type == S7WLReal:
+            return get_real(result, 0)  
+        elif data_type == S7WLDWord:
+            return get_word(result, 0)
+        else:
+            return None  
+
+
     def __on_start_button(self):
         self.manl_start_record = True
         self.manl_stop_record = False
-        
         # Defining for the Video Recorder   
         self.manl_fourcc = cv2.VideoWriter_fourcc(*'XVID')    
         start_record_time = str(datetime.now()).replace(":", "").replace(" ", "_")  
         print(self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi")
         self.manl_video_path = self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi"     
-        self.manl_out = cv2.VideoWriter(self.manl_video_path,self.manl_fourcc, 20,  (691, 641)) 
+        self.manl_out = cv2.VideoWriter(self.manl_video_path,self.manl_fourcc, 20,  (691, 641))
 
     def __on_stop_button(self):
         self.manl_stop_record = True
@@ -591,18 +610,17 @@ class MouthProtectionApp():
     def __on_saveConf_button(self):
         self.save_configuration = True   
         self.initCommunication()
-        
         # Defining the recording directory
         if int(self.primPath_checkBox.checkState()) ==  2:   # 2: True, 0: False
                 self.folder_dir = self.prmRecPath_text.text()
         elif int(self.secondPath_checkBox.checkState()) ==  2:
                 self.folder_dir = self.secRecPath_text.text()
-        
         # Initializing the cap
         self.cap = cv2.VideoCapture(self.url)  
         self.cap.set(cv2.CAP_PROP_FPS, 20)
     
-    ### Live Video Stream Analyser 
+    
+    ### Live Video Stream Analyser: Siemens
     def update_video_SiemensPlc(self):
         # if True:    
         if self.save_configuration == True:
@@ -614,6 +632,32 @@ class MouthProtectionApp():
                 self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
                 self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
                 
+                # # Watchdog Management 
+                # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
+                #     self.watchdog_counter += 1
+                # else:
+                #     self.watchdog_counter = 0  
+                
+                # if self.watchdog_counter > 100:
+                #     print("Communication Error!")  
+                #     self.Plc_Jetson_Communication = False
+                #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+                #     brush.setStyle(QtCore.Qt.NoBrush)
+                #     comm_item = self.visionVariables_widget_table.item(1, 0)
+                #     comm_item.setForeground(brush)
+                # else:
+                #     print("Communication Okay!")        
+                #     self.Plc_Jetson_Communication = True
+                #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+                #     brush.setStyle(QtCore.Qt.NoBrush)
+                #     comm_item = self.visionVariables_widget_table.item(1, 0)
+                #     comm_item.setForeground(brush)
+                # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
+                # self.ToPlc_Watchdog = self.FromPlc_Watchdog   
+                
+                #   Wrinting output to PLC    
+                # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean)))     
+                
                 # updating the time and date
                 current_datetime = QDateTime.currentDateTime()   
                 self.dateTimeEdit.setDateTime(current_datetime)
@@ -622,7 +666,7 @@ class MouthProtectionApp():
                 ret, frame = self.cap.read()
                 if ret:
                         print("---------------------------------------------------------------------------------------------------------------")
-                        image = self.process_frame_SiemensPlc(frame)                       
+                        image = self.process_frame(frame)                       
                         # Display the processed frame and variables in the GUI   
                         self.display_frame(image)     
                         end_time = time.time()      
@@ -633,28 +677,65 @@ class MouthProtectionApp():
 
 
 
+    ### Live Video Stream Analyser: Allen Bradly
     def update_video_AllenBradlyPlc(self):
-        self.plc_ip_address = self.plcIp_text.text()    
-        with LogixDriver(self.plc_ip_address) as plc:
-            self.plc = plc
-            # updating the time and date
-            current_datetime = QDateTime.currentDateTime()      
-            self.dateTimeEdit.setDateTime(current_datetime)
-            self.url = self.cameraUrl_line.text() 
-            cap = cv2.VideoCapture(self.url)  
-            # Read a frame from the stream
-            ret, frame = cap.read()
-            if ret:
-                print("---------------------------------------------------------------------------------------------------------------")
-                image, reference_time = self.process_frame_AllenBradlyPlc(frame)                            
-                # Display the processed frame and variables in the GUI   
-                self.display_frame(image)     
-                self.display_variables(reference_time)       
-              
+        # if True:    
+        if self.save_configuration == True:
+            start_time = time.time()
+            self.plc_ip_address = self.plcIp_text.text()    
+            
+            with LogixDriver(self.plc_ip_address) as plc:
+                self.plc = plc
+                # Reading variables from the plc
+                WatchdogFromPlc = (plc.read('Mouth_Door')).value  # Reading the value "Raspi".TO.Watchdog  from plc
+                WatchdogFromPlc = (plc.read('Extrusion_Run')).value  # Reading the value "Raspi".TO.Watchdog  from plc
+                WatchdogFromPlc = (plc.read('Heart_Beat')).value  # Reading the value "Raspi".TO.Watchdog  from plc
                 
+                # updating the time and date
+                current_datetime = QDateTime.currentDateTime()      
+                self.dateTimeEdit.setDateTime(current_datetime)
+                
+                # # Watchdog Management 
+                # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
+                #     self.watchdog_counter += 1
+                # else:
+                #     self.watchdog_counter = 0  
+                    
+                # if self.watchdog_counter > 100:
+                #     print("Communication Error!")  
+                #     self.Plc_Jetson_Communication = False
+                #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+                #     brush.setStyle(QtCore.Qt.NoBrush)
+                #     comm_item = self.visionVariables_widget_table.item(1, 0)
+                #     comm_item.setForeground(brush)
+                # else:
+                #     print("Communication Okay!")        
+                #     self.Plc_Jetson_Communication = True
+                #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+                #     brush.setStyle(QtCore.Qt.NoBrush)
+                #     comm_item = self.visionVariables_widget_table.item(1, 0)
+                #     comm_item.setForeground(brush)
+                # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
+                # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
+                
+                
+                # Read a frame from the stream
+                ret, frame = self.cap.read()
+                if ret:
+                        print("---------------------------------------------------------------------------------------------------------------")
+                        image = self.process_frame(frame)                       
+                        # Display the processed frame and variables in the GUI   
+                        self.display_frame(image)     
+                        end_time = time.time()      
+                        # Modify the frame and calculate result and reference_time as needed
+                        reference_time = "Reference Time:                {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
+                        print(reference_time)
+                        self.display_variables(reference_time)       
+                
+            
 
-    def process_frame_SiemensPlc(self, frame):    
-          
+    def process_frame(self, frame):    
+        
         image = cv2.resize(frame, (691, 641))   # resize to the defined image_size        
         print(f"Manual Start: {self.manl_start_record}, Manual stop: {self.manl_stop_record}")
         print(f"Automatic Start: {self.auto_start_record}, Automatic stop: {self.auto_stop_record}")
@@ -669,8 +750,7 @@ class MouthProtectionApp():
             self.manl_out.release()
             self.manl_start_record = False     
         
-
-
+        
         # Automatic Recording
         if (self.mouth_door_tag == True) & (self.extrusion_tag == True):
             if self.first_auto_record_img == True:
@@ -694,85 +774,11 @@ class MouthProtectionApp():
                     self.auto_stop_record = True
                     self.auto_out.release()
                     self.first_auto_record_img = True
-                  
-                        
-                                                      
-        # # Watchdog Management 
-        # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-        #     self.watchdog_counter += 1
-        # else:
-        #     self.watchdog_counter = 0  
-
-        # if self.watchdog_counter > 100:
-        #     print("Communication Error!")  
-        #     self.Plc_Jetson_Communication = False
-        #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # else:
-        #     print("Communication Okay!")        
-        #     self.Plc_Jetson_Communication = True
-        #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-        # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
         
-        #   Wrinting output to PLC    
-        # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean))) 
-
         return image
     
     
     
-    
-    def process_frame_AllenBradlyPlc(self, frame):  
-            
-        start_time = time.time()      
-        
-        # # Reading variables from the plc    
-        # self.FromPlc_Watchdog = (self.plc.read("JETSON_TO_Watchdog")).value
-        # self.FromPlc_ResultAck = (self.plc.read("JETSON_TO_ResultAck")).value
-        # self.FromPlc_Pressure = (self.plc.read("JETSON_TO_Pressure")).value
-        # self.FromPlc_Speed = (self.plc.read("JETSON_TO_Speed")).value 
-        # # counter(s)   
-        # self.counter += 1    
-        # self.command_init_counter += 1  
-        # self.sleep_new_command_counter += 1
-
-        # # Watchdog Management 
-        # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-        #     self.watchdog_counter += 1
-        # else:
-        #     self.watchdog_counter = 0  
-            
-        # if self.watchdog_counter > 100:
-        #     print("Communication Error!")  
-        #     self.Plc_Jetson_Communication = False
-        #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # else:
-        #     print("Communication Okay!")        
-        #     self.Plc_Jetson_Communication = True
-        #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-        # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
-        
-        image = cv2.resize(frame, (691, 641))   # resize to the defined image_size
-                             
-        #   Wrinting output to PLC   
-        # self.plc.write('JETSON_FROM_Watchdog', self.ToPlc_Watchdog) 
-        end_time = time.time()          
-        # Modify the frame and calculate result and reference_time as needed
-        reference_time = "Reference Time:                {:.3f} (seconds)".format(end_time - start_time)  # Replace with actual reference time
-        return image, reference_time
     
     # display the opencv BGR image into the defined lables in Qt Designer.
     def display_frame(self, frame):  
@@ -793,28 +799,7 @@ class MouthProtectionApp():
         self.heartbeatTag_text.setText(str(self.heartbeat_tag))
         
 
-    # Reading Tags's Values in PLC
-    def ReadDataBlock(self, plc, data_block_number, byte, bit, size, data_type):
-        """
-        plc
-        data-block(int): number of Data Block; DB1, DB2, ...
-        byte(int): in case of 2.0, byte is 2.
-        bit(int): in case of 2.0,bit is 0.
-        size(int): The size of the db data to read  
-        data_type(variable): S7WLBit, S7WLWord, S7WLReal, S7WLDDword 
 
-        """
-        result = plc.db_read(data_block_number, byte, size)
-        if data_type == S7WLBit:
-            return get_bool(result, 0, bit)
-        elif data_type == S7WLByte or data_type == S7WLWord:
-            return get_int(result, 0)
-        elif data_type == S7WLReal:
-            return get_real(result, 0)  
-        elif data_type == S7WLDWord:
-            return get_word(result, 0)
-        else:
-            return None  
 
     def closeEvent(self, event):  
         self.video_capture.release()
