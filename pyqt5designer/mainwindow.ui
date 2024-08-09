@@ -354,7 +354,7 @@ border-color: rgb(220, 220, 240);</string>
         <x>10</x>
         <y>50</y>
         <width>771</width>
-        <height>541</height>
+        <height>591</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -424,8 +424,8 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>104</y>
-         <width>731</width>
+         <y>100</y>
+         <width>621</width>
          <height>30</height>
         </rect>
        </property>
@@ -452,7 +452,7 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>73</y>
+         <y>69</y>
          <width>731</width>
          <height>31</height>
         </rect>
@@ -476,9 +476,9 @@ border-color: rgb(220, 220, 240);</string>
       <widget class="QLineEdit" name="plcIp_text">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>280</y>
-         <width>731</width>
+         <x>390</x>
+         <y>305</y>
+         <width>361</width>
          <height>30</height>
         </rect>
        </property>
@@ -505,7 +505,7 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>150</y>
+         <y>141</y>
          <width>731</width>
          <height>31</height>
         </rect>
@@ -529,9 +529,9 @@ border-color: rgb(220, 220, 240);</string>
       <widget class="QLabel" name="plcIp_label">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>249</y>
-         <width>731</width>
+         <x>390</x>
+         <y>273</y>
+         <width>361</width>
          <height>31</height>
         </rect>
        </property>
@@ -555,7 +555,7 @@ border-color: rgb(220, 220, 240);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>420</y>
+         <y>462</y>
          <width>731</width>
          <height>30</height>
         </rect>
@@ -583,7 +583,7 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>463</y>
+         <y>510</y>
          <width>731</width>
          <height>31</height>
         </rect>
@@ -608,7 +608,7 @@ border-color: rgb(220, 220, 240);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>352</y>
+         <y>387</y>
          <width>731</width>
          <height>30</height>
         </rect>
@@ -636,7 +636,7 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>321</y>
+         <y>356</y>
          <width>731</width>
          <height>31</height>
         </rect>
@@ -661,7 +661,7 @@ border-color: rgb(220, 220, 240);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>389</y>
+         <y>431</y>
          <width>731</width>
          <height>31</height>
         </rect>
@@ -686,7 +686,7 @@ border-color: rgb(220, 220, 240);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>492</y>
+         <y>540</y>
          <width>731</width>
          <height>30</height>
         </rect>
@@ -714,8 +714,8 @@ background-color: rgb(255, 255, 255);</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>180</y>
-         <width>730</width>
+         <y>171</y>
+         <width>621</width>
          <height>61</height>
         </rect>
        </property>
@@ -733,12 +733,131 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;sddsdsdsd&lt;br /&gt;hjhjhj&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="primPath_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>101</y>
+         <width>111</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="accessibleDescription">
+        <string/>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>      Select </string>
+       </property>
+       <property name="tristate">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="secondPath_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>171</y>
+         <width>111</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>      Select </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>305</y>
+         <width>241</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0,0,0);
+</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
+       <item>
+        <property name="text">
+         <string>Siemens</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Allen Bradly</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="plctype_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>273</y>
+         <width>251</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(220, 220, 240);</string>
+       </property>
+       <property name="text">
+        <string>PLC Type</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
      <widget class="QPushButton" name="saveCong_pushButton">
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>630</y>
+        <y>660</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -756,18 +875,23 @@ border-color: rgb(0, 0, 0);</string>
       <property name="geometry">
        <rect>
         <x>290</x>
-        <y>620</y>
+        <y>651</y>
         <width>201</width>
         <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
+     <zorder>saveConf_label</zorder>
+     <zorder>setting_title</zorder>
+     <zorder>setting_frame</zorder>
+     <zorder>saveCong_pushButton</zorder>
     </widget>
     <widget class="QWidget" name="header_widget" native="true">
      <property name="geometry">

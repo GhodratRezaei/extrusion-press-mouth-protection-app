@@ -1,11 +1,13 @@
 ## Importing Packages
 
+# Built-in standard packages
 import sys
 import datetime
-import cv2
-import numpy as np  
 import time
 import os
+# opencv package
+
+import cv2
 
 # PyQT5 Packages
 from PyQt5.QtWidgets import QMessageBox, QApplication, QMainWindow, QCommandLinkButton, QTabWidget, QPushButton, QVBoxLayout, QDialog, QLabel, QSizePolicy, QWidget, QLayout
@@ -26,48 +28,60 @@ from snap7.types import *
 
 class MouthProtectionApp():                  
                                             
-    defined_plc_types = ["TiaPortal", "Rockwell"]
+    defined_plc_types = ["Siemens", "AllenBradly"]
     def __init__(self, video_dir, fps, plc_type):
             
-        self.video_dir = video_dir
+        # video recorder parameters    
         self.fps = fps  
+        self.folder_dir = ""
+        self.record_timer_limit = 300  # 5 (min) = 300 (s) 
+        self.first_auto_record_img = True
+
+        # Plc Communication 
         self.plc_type = plc_type
         self.plc_connection = False
-        assert (self.plc_type in MouthProtectionApp.defined_plc_types) , "Plc Type inserted {} is not among the defined plc variables; {}. please insert the verified plc type.".format(self.plc_type, MouthProtectionApp.defined_plc_types) 
-
         self.ToPlc_Watchdog = False
         self.FromPlc_Watchdog = False
         self.WatchdogFromPlcMem = False   
         self.watchdog_counter = 0
         self.ToPlc_Result = 0                
         self.Plc_Jetson_Communication = False 
+        assert (self.plc_type in MouthProtectionApp.defined_plc_types) , "Plc Type inserted {} is not among the defined plc variables; {}. please insert the verified plc type.".format(self.plc_type, MouthProtectionApp.defined_plc_types) 
         
-        self.start_record = False
-        self.stop_record = False
-        self.pause_record = False
-        self.save_record = False
+        # Manual Push buttons to manage records
+        self.manl_start_record = False
+        self.manl_stop_record = False
+        self.manl_pause_record = False
+        self.manl_save_record = False
+        
+        # Automatic record managing
+        self.auto_start_record = False
+        self.auto_stop_record = False
+        self.auto_pause_record = False
+        self.auto_save_record = False
+        
+        # save configurations 
         self.save_configuration = False
         
-        self.prim_dir = "E:\Danieli Breda\Extrusion Press\Automation\mouth-protection\Recorded_videos"
-        self.second_dir = ""
-
+        # Logo and icon
         self.danieli_logo_image = cv2.imread("resources\logo.jpg")
         self.danieli_icon =  "READ the ICON HERE."
         
+ 
 
-#     def initCommunication(self):         
-#         try:        
-#             if (self.plc_type == "TiaPortal") & (self.plc_connection == False):    
-#                 self.client = snap7.client.Client()
-#                 self.client.connect("192.168.1.1", 0, 1) 
-#                 print("PLC Cponnection is okay!")
-#                 self.plc_connection = True
-#         except Exception as e:
-#             print(f"Error:   {e}")  
-
-        self.client = snap7.client.Client()
-        self.client.connect("192.168.1.1", 0, 1) 
-        print("PLC Cponnection is okay!")
+    def initCommunication(self):    
+        self.plc_type = str(self.comboBox.currentText())
+        try:        
+            if (self.plc_type == "Siemens"):    
+                self.client = snap7.client.Client()
+                self.client.connect(self.plcIp_text.text(), 0, 1) 
+                print("PLC Cponnection is okay!")
+                self.plc_connection = True
+            elif (self.plc_type == "Allen Bradly"):  
+                self.client = "Define the client python API for Allen Bradly PLC"
+                print("PLC Cponnection is okay!")
+        except Exception as e:
+            print(f"Error:   {e}")            
             
         
         
@@ -101,7 +115,13 @@ class MouthProtectionApp():
         font3.setBold(False)
         font3.setItalic(False)
         font3.setWeight(50)
-
+        #font4: combobox
+        font4 = QtGui.QFont()
+        font4.setPointSize(10)
+        #font5: checkbox
+        font5 = QtGui.QFont()
+        font5.setBold(True)
+        font5.setWeight(75)
 
         ## Main Window
         mouthProtectionWinow.setWindowIcon(QtGui.QIcon("resources/favicon.ico"))
@@ -268,8 +288,8 @@ class MouthProtectionApp():
 "border-color: rgb(220, 220, 240);")
         self.setting_title.setAlignment(Qt.AlignCenter)
         self.setting_frame = QtWidgets.QFrame(self.setting_widget)
-        self.setting_frame.setObjectName(u"setting_frame")
-        self.setting_frame.setGeometry(QtCore.QRect(10, 50, 771, 541))
+        self.setting_frame.setObjectName(u"setting_frame")    
+        self.setting_frame.setGeometry(QtCore.QRect(10, 50, 771, 591))
         self.setting_frame.setStyleSheet(u"border-color: rgb(220, 220, 240);\n"
 "border-color: rgb(0, 0, 0);")
         self.setting_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -291,23 +311,22 @@ class MouthProtectionApp():
 "background-color: rgb(255, 255, 255);")
         self.prmRecPath_text = QtWidgets.QLineEdit(self.setting_frame)
         self.prmRecPath_text.setObjectName(u"prmRecPath_text")
-        self.prmRecPath_text.setGeometry(QtCore.QRect(20, 104, 731, 30))
+        self.prmRecPath_text.setGeometry(QtCore.QRect(20, 100, 621, 30))
         self.prmRecPath_text.setFont(font2)
-        self.prmRecPath_text.setText("E:\Danieli Breda\Extrusion Press\Automation\mouth-protection\Recorded_videos")
         self.prmRecPath_text.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";\n"
 "color: rgb(0, 0, 0);\n"
 "background-color: rgb(255, 255, 255);")
         self.prmRecPath_label = QLabel(self.setting_frame)
         self.prmRecPath_label.setObjectName(u"prmRecPath_label")
-        self.prmRecPath_label.setGeometry(QtCore.QRect(20, 73, 731, 31))
+        self.prmRecPath_label.setGeometry(QtCore.QRect(20, 69, 731, 31))
         self.prmRecPath_label.setFont(font2)
         self.prmRecPath_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.prmRecPath_label.setAlignment(Qt.AlignCenter)
         self.plcIp_text = QtWidgets.QLineEdit(self.setting_frame)
         self.plcIp_text.setObjectName(u"plcIp_text")
-        self.plcIp_text.setGeometry(QtCore.QRect(20, 280, 731, 30))
+        self.plcIp_text.setGeometry(QtCore.QRect(390, 305, 361, 30))
         self.plcIp_text.setFont(font2)
         self.plcIp_text.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";\n"
@@ -315,21 +334,21 @@ class MouthProtectionApp():
 "background-color: rgb(255, 255, 255);")
         self.secRecPath_label = QLabel(self.setting_frame)
         self.secRecPath_label.setObjectName(u"secRecPath_label")
-        self.secRecPath_label.setGeometry(QtCore.QRect(20, 150, 731, 31))
+        self.secRecPath_label.setGeometry(QtCore.QRect(20, 141, 731, 31))
         self.secRecPath_label.setFont(font2)
         self.secRecPath_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.secRecPath_label.setAlignment(Qt.AlignCenter)
         self.plcIp_label = QLabel(self.setting_frame)
         self.plcIp_label.setObjectName(u"plcIp_label")
-        self.plcIp_label.setGeometry(QtCore.QRect(20, 249, 731, 31))
+        self.plcIp_label.setGeometry(QtCore.QRect(390, 273, 361, 31))
         self.plcIp_label.setFont(font2)
         self.plcIp_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.plcIp_label.setAlignment(Qt.AlignCenter)
         self.extrusionTag_text = QtWidgets.QLineEdit(self.setting_frame)
         self.extrusionTag_text.setObjectName(u"extrusionTag_text")
-        self.extrusionTag_text.setGeometry(QtCore.QRect(20, 420, 731, 30))
+        self.extrusionTag_text.setGeometry(QtCore.QRect(20, 462, 731, 30))
         self.extrusionTag_text.setFont(font2)
         self.extrusionTag_text.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";\n"
@@ -337,14 +356,14 @@ class MouthProtectionApp():
 "background-color: rgb(255, 255, 255);")
         self.heartbeatTag_label = QLabel(self.setting_frame)
         self.heartbeatTag_label.setObjectName(u"heartbeatTag_label")
-        self.heartbeatTag_label.setGeometry(QtCore.QRect(20, 463, 731, 31))
+        self.heartbeatTag_label.setGeometry(QtCore.QRect(20, 510, 731, 31))
         self.heartbeatTag_label.setFont(font2)
         self.heartbeatTag_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.heartbeatTag_label.setAlignment(Qt.AlignCenter)
         self.mouthDoorTag_text = QtWidgets.QLineEdit(self.setting_frame)
         self.mouthDoorTag_text.setObjectName(u"mouthDoorTag_text")
-        self.mouthDoorTag_text.setGeometry(QtCore.QRect(20, 352, 731, 30))
+        self.mouthDoorTag_text.setGeometry(QtCore.QRect(20, 387, 731, 30))
         self.mouthDoorTag_text.setFont(font2)
         self.mouthDoorTag_text.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";\n"
@@ -352,21 +371,21 @@ class MouthProtectionApp():
 "background-color: rgb(255, 255, 255);")
         self.MouthDoorTag_label = QLabel(self.setting_frame)
         self.MouthDoorTag_label.setObjectName(u"MouthDoorTag_label")
-        self.MouthDoorTag_label.setGeometry(QtCore.QRect(20, 321, 731, 31))
+        self.MouthDoorTag_label.setGeometry(QtCore.QRect(20, 356, 731, 31))
         self.MouthDoorTag_label.setFont(font2)
         self.MouthDoorTag_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.MouthDoorTag_label.setAlignment(Qt.AlignCenter)
         self.extrusionTag_label = QLabel(self.setting_frame)
         self.extrusionTag_label.setObjectName(u"extrusionTag_label")
-        self.extrusionTag_label.setGeometry(QtCore.QRect(20, 389, 731, 31))
+        self.extrusionTag_label.setGeometry(QtCore.QRect(20, 431, 731, 31))
         self.extrusionTag_label.setFont(font2)
         self.extrusionTag_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.extrusionTag_label.setAlignment(Qt.AlignCenter)
         self.heartbeatTag_text = QtWidgets.QLineEdit(self.setting_frame)
         self.heartbeatTag_text.setObjectName(u"heartbeatTag_text")
-        self.heartbeatTag_text.setGeometry(QtCore.QRect(20, 492, 731, 30))
+        self.heartbeatTag_text.setGeometry(QtCore.QRect(20, 540, 731, 30))
         self.heartbeatTag_text.setFont(font2)
         self.heartbeatTag_text.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";\n"
@@ -374,21 +393,54 @@ class MouthProtectionApp():
 "background-color: rgb(255, 255, 255);")
         self.secRecPath_text = QtWidgets.QTextEdit(self.setting_frame)
         self.secRecPath_text.setObjectName(u"secRecPath_text")
-        self.secRecPath_text.setGeometry(QtCore.QRect(20, 180, 730, 61))
+        self.secRecPath_text.setGeometry(QtCore.QRect(20, 171, 621, 61))
         self.secRecPath_text.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
 "color: rgb(0, 0, 0);\n"
 "border-color: rgb(0, 0, 0);\n"
 "font: 12pt \"Segoe UI\";")
+        self.primPath_checkBox = QtWidgets.QCheckBox(self.setting_frame)
+        self.primPath_checkBox.setObjectName(u"primPath_checkBox")
+        self.primPath_checkBox.setGeometry(QtCore.QRect(640, 101, 111, 30))
+        self.primPath_checkBox.setFont(font5)
+        self.primPath_checkBox.setStyleSheet(u"color: rgb(0, 0, 0);")
+        self.primPath_checkBox.setChecked(True) 
+        self.secondPath_checkBox = QtWidgets.QCheckBox(self.setting_frame)
+        self.secondPath_checkBox.setObjectName(u"secondPath_checkBox")
+        self.secondPath_checkBox.setGeometry(QtCore.QRect(640, 171, 111, 61))
+        self.secondPath_checkBox.setFont(font5)
+        self.secondPath_checkBox.setStyleSheet(u"color: rgb(0, 0, 0);")
+        self.secondPath_checkBox.setChecked(False) 
+        self.comboBox = QtWidgets.QComboBox(self.setting_frame)
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.setObjectName(u"comboBox")
+        self.comboBox.setGeometry(QtCore.QRect(30, 305, 241, 31))
+        self.comboBox.setFont(font4)
+        self.comboBox.setStyleSheet(u"color: rgb(0, 0, 0);")
+        self.comboBox.setCurrentText("Siemens") 
+        self.plctype_label = QLabel(self.setting_frame)
+        self.plctype_label.setObjectName(u"plctype_label")
+        self.plctype_label.setGeometry(QtCore.QRect(20, 273, 251, 31))
+        self.plctype_label.setFont(font2)
+        self.plctype_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"border-color: rgb(220, 220, 240);")
+        self.plctype_label.setAlignment(Qt.AlignCenter)
+        
         self.saveConf_label = QLabel(self.setting_widget)
         self.saveConf_label.setObjectName(u"saveConf_label")
-        self.saveConf_label.setGeometry(QtCore.QRect(290, 620, 201, 41))
-        self.saveConf_label.setStyleSheet(u"background-color: rgb(255, 255, 255);")
+        self.saveConf_label.setGeometry(QtCore.QRect(290, 651, 201, 41))
+        self.saveConf_label.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
+"color: rgb(0, 0, 0);")
         
-        self.saveConf_pushButton = QPushButton(self.setting_widget)
-        self.saveConf_pushButton.setObjectName(u"pushButton")
-        self.saveConf_pushButton.setGeometry(QtCore.QRect(300, 630, 181, 21))
+        
+        self.saveCong_pushButton = QPushButton(self.setting_widget)
+        self.saveCong_pushButton.setObjectName(u"saveCong_pushButton")
+        self.saveCong_pushButton.setGeometry(QtCore.QRect(300, 660, 181, 21))
+        self.saveCong_pushButton.setStyleSheet(u"color: rgb(0, 0, 0);\n"
+"font: 75 12pt \"Arial\";\n"
+"border-color: rgb(0, 0, 0);")
         # Set the style for normal and hover state
-        self.saveConf_pushButton.setStyleSheet("""
+        self.saveCong_pushButton.setStyleSheet("""
             QPushButton {
                 color: rgb(0, 0, 0);
                 font: 75 12pt \"Arial\";
@@ -398,8 +450,7 @@ class MouthProtectionApp():
                 background-color: lightblue;
             }
         """)
-        self.saveConf_pushButton.clicked.connect(self.__on_saveConf_button)
-        
+        self.saveCong_pushButton.clicked.connect(self.__on_saveConf_button)
         
         
         # Header Widget
@@ -460,19 +511,14 @@ class MouthProtectionApp():
         self.dateTimeEdit.setDateTime(current_datetime)  
         self.url = self.cameraUrl_line.text()
 
-        self.cap = cv2.VideoCapture(self.url)  
-        self.cap.set(cv2.CAP_PROP_FPS, 20)   
-
-
         # Updating frames within loop
         self.timer = QTimer(mouthProtectionWinow)      
-        if (self.plc_type == "TiaPortal"):
-            self.timer.timeout.connect(self.update_video_tiaPortalPlc)
+        if (self.plc_type == "Siemens"):
+            self.timer.timeout.connect(self.update_video_SiemensPlc)
             self.timer.start(5)        # update frame every (1000//(self.ps = 1000)  = 1 ms)   second(s)
-        elif (self.plc_type == "Rockwell"):
-            self.timer.timeout.connect(self.update_video_RockwellPlc)  
-            self.timer.start(1000 // self.fps)         
-
+        elif (self.plc_type == "AllenBradly"):
+            self.timer.timeout.connect(self.update_video_AllenBradlyPlc)  
+            self.timer.start(1000 // self.fps)        
 
 
     def retranslateUi(self, MainWindow):
@@ -498,9 +544,14 @@ class MouthProtectionApp():
         self.cameraUrl_line.setText("rtsp://192.168.1.100:554/stream2")
         self.prmRecPath_text.setText("E:\Danieli Breda\Extrusion Press\Automation\mouth-protection\Recorded_videos")
         self.prmRecPath_label.setText(_translate("Danieli Mouth Protectoion Application", u"Primary recording path", None))
+        self.primPath_checkBox.setText(_translate("Danieli Mouth Protectoion Application", u"Check", None))
         self.plcIp_text.setText("192.168.1.1")
         self.secRecPath_label.setText(_translate("Danieli Mouth Protectoion Application", u"Secondary recording path (local only)", None))
+        self.secondPath_checkBox.setText(_translate("Danieli Mouth Protectoion Application", u"Check", None))
         self.plcIp_label.setText(_translate("Danieli Mouth Protectoion Application", u"PLC IP address", None))
+        self.plctype_label.setText(_translate("Danieli Mouth Protectoion Application", u"PLC Type", None))
+        self.comboBox.setItemText(0, _translate("Danieli Mouth Protectoion Application", u"Siemens", None))
+        self.comboBox.setItemText(1, _translate("Danieli Mouth Protectoion Application", u"Allen Bradly", None))
         self.extrusionTag_text.setText("")
         self.heartbeatTag_label.setText(_translate("Danieli Mouth Protectoion Application", u"Heartbeat tag", None))
         self.mouthDoorTag_text.setText("")
@@ -511,56 +562,67 @@ class MouthProtectionApp():
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">sddsdsdsd<br />hjhjhj</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">ukjjojkuj,</p></body></html>", None))
-        self.saveConf_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Save Configuration", None))
+        self.saveCong_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Save Configuration", None))
         self.saveConf_label.setText("")
         
 
-
     def __on_start_button(self):
+        self.manl_start_record = True
+        self.manl_stop_record = False
+        
         # Defining for the Video Recorder   
-        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')    
-        self.video_path = self.prim_dir + "/Recorded_videos.avi" 
-        self.out = cv2.VideoWriter(self.video_path,self.fourcc, 20,  (691, 641)) 
-        self.start_record = True
-
+        self.manl_fourcc = cv2.VideoWriter_fourcc(*'XVID')    
+        start_record_time = str(datetime.now()).replace(":", "").replace(" ", "_")  
+        print(self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi")
+        self.manl_video_path = self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi"     
+        self.manl_out = cv2.VideoWriter(self.manl_video_path,self.manl_fourcc, 20,  (691, 641)) 
 
     def __on_stop_button(self):
-            self.stop_record = True
-            self.start_record = False
+        self.manl_stop_record = True
+        self.manl_start_record = False
             
     def __on_save_button(self):
-            self.save_record = True
+        self.manl_save_record = True
     
     def __on_pause_button(self):
-            self.pause_record = True
+        self.manl_pause_record = True
 
     def __on_saveConf_button(self):
-            self.save_configuration = True     
-    
+        self.save_configuration = True   
+        self.initCommunication()
+        
+        # Defining the recording directory
+        if int(self.primPath_checkBox.checkState()) ==  2:   # 2: True, 0: False
+                self.folder_dir = self.prmRecPath_text.text()
+        elif int(self.secondPath_checkBox.checkState()) ==  2:
+                self.folder_dir = self.secRecPath_text.text()
+        
+        # Initializing the cap
+        self.cap = cv2.VideoCapture(self.url)  
+        self.cap.set(cv2.CAP_PROP_FPS, 20)
     
     ### Live Video Stream Analyser 
-    def update_video_tiaPortalPlc(self):
-        if True:    
-        # if self.save_configuration == True:
+    def update_video_SiemensPlc(self):
+        # if True:    
+        if self.save_configuration == True:
                 start_time = time.time()
-                self.plc_ip_address = self.plcIp_text.text()    
-                # self.initCommunication()
+                self.plc_ip_address = self.plcIp_text.text()   
+                
+                # Reading variables from the plc
+                self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
+                self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
+                self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
                 
                 # updating the time and date
                 current_datetime = QDateTime.currentDateTime()   
                 self.dateTimeEdit.setDateTime(current_datetime)
-                # self.url = self.cameraUrl_line.text()
-                print(self.url)
-                
+                                
                 # Read a frame from the stream
                 ret, frame = self.cap.read()
                 if ret:
                         print("---------------------------------------------------------------------------------------------------------------")
-
-                        image = self.process_frame_tiaPortalPlc(frame)   
-                                                
+                        image = self.process_frame_SiemensPlc(frame)                       
                         # Display the processed frame and variables in the GUI   
                         self.display_frame(image)     
                         end_time = time.time()      
@@ -571,64 +633,92 @@ class MouthProtectionApp():
 
 
 
-    def update_video_RockwellPlc(self):
+    def update_video_AllenBradlyPlc(self):
         self.plc_ip_address = self.plcIp_text.text()    
         with LogixDriver(self.plc_ip_address) as plc:
             self.plc = plc
             # updating the time and date
             current_datetime = QDateTime.currentDateTime()      
             self.dateTimeEdit.setDateTime(current_datetime)
-            self.url = self.cameraUrl_line.text()
+            self.url = self.cameraUrl_line.text() 
             cap = cv2.VideoCapture(self.url)  
             # Read a frame from the stream
             ret, frame = cap.read()
             if ret:
                 print("---------------------------------------------------------------------------------------------------------------")
-                image, reference_time = self.process_frame_RockwellPlc(frame)                            
+                image, reference_time = self.process_frame_AllenBradlyPlc(frame)                            
                 # Display the processed frame and variables in the GUI   
                 self.display_frame(image)     
                 self.display_variables(reference_time)       
               
                 
 
-    def process_frame_tiaPortalPlc(self, frame):      
-        image = cv2.resize(frame, (691, 641))   # resize to the defined image_size
-        # Reading variables from the plc
-        self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
-        self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
-        self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit)
+    def process_frame_SiemensPlc(self, frame):    
+          
+        image = cv2.resize(frame, (691, 641))   # resize to the defined image_size        
+        print(f"Manual Start: {self.manl_start_record}, Manual stop: {self.manl_stop_record}")
+        print(f"Automatic Start: {self.auto_start_record}, Automatic stop: {self.auto_stop_record}")
         
-        print(self.start_record)
-        if (self.start_record == True) & (self.stop_record == False):
-                print("***************************************************************** Recording is happening ")
-                print("Writting Enable.") 
-                self.out.write(image)     
-        if self.stop_record == True:
-                self.out.release()
-                self.start_record = False
-                                                                            
-                # # Watchdog Management 
-                # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-                #     self.watchdog_counter += 1
-                # else:
-                #     self.watchdog_counter = 0  
-                
-                # if self.watchdog_counter > 100:
-                #     print("Communication Error!")  
-                #     self.Plc_Jetson_Communication = False
-                #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # else:
-                #     print("Communication Okay!")        
-                #     self.Plc_Jetson_Communication = True
-                #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-                # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
+        # Manual Recording
+        if (self.manl_start_record == True) & (self.manl_stop_record == False):
+            print("*****************************   Manual Recording is happening ")
+            print("Writting Enable.") 
+            self.manl_out.write(image)
+        
+        if self.manl_stop_record == True:
+            self.manl_out.release()
+            self.manl_start_record = False     
+        
+
+
+        # Automatic Recording
+        if (self.mouth_door_tag == True) & (self.extrusion_tag == True):
+            if self.first_auto_record_img == True:
+                self.record_timer = time.time()    
+                self.auto_start_record = True
+                self.auto_stop_record = False
+                # Defining for the Video Recorder   
+                self.auto_fourcc = cv2.VideoWriter_fourcc(*'XVID')    
+                start_record_time = str(datetime.now()).replace(":", "").replace(" ", "_")  
+                print(self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi")
+                self.auto_video_path = self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi"     
+                self.auto_out = cv2.VideoWriter(self.auto_video_path,self.auto_fourcc, 20,  (691, 641)) 
+                self.first_auto_record_img = False
+            print("*****************************   Auto Recording is happening ")
+            print("Writting Enable.") 
+            self.auto_out.write(image)     
+
+        if self.auto_start_record:
+            if (self.mouth_door_tag == False) | (self.record_timer - (time.time()) > self.record_timer_limit):
+                    self.auto_start_record = False     
+                    self.auto_stop_record = True
+                    self.auto_out.release()
+                    self.first_auto_record_img = True
+                  
+                        
+                                                      
+        # # Watchdog Management 
+        # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
+        #     self.watchdog_counter += 1
+        # else:
+        #     self.watchdog_counter = 0  
+
+        # if self.watchdog_counter > 100:
+        #     print("Communication Error!")  
+        #     self.Plc_Jetson_Communication = False
+        #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+        #     brush.setStyle(QtCore.Qt.NoBrush)
+        #     comm_item = self.visionVariables_widget_table.item(1, 0)
+        #     comm_item.setForeground(brush)
+        # else:
+        #     print("Communication Okay!")        
+        #     self.Plc_Jetson_Communication = True
+        #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+        #     brush.setStyle(QtCore.Qt.NoBrush)
+        #     comm_item = self.visionVariables_widget_table.item(1, 0)
+        #     comm_item.setForeground(brush)
+        # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
+        # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
         
         #   Wrinting output to PLC    
         # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean))) 
@@ -638,7 +728,7 @@ class MouthProtectionApp():
     
     
     
-    def process_frame_RockwellPlc(self, frame):  
+    def process_frame_AllenBradlyPlc(self, frame):  
             
         start_time = time.time()      
         
@@ -736,7 +826,7 @@ def main():
     
     video_dir = "" 
     fps = 800
-    plc_type = "TiaPortal"   # TiaPortal or Rockwell    
+    plc_type = "Siemens"   # Siemens or AllenBradly    
                                                           
     app = QApplication(sys.argv)                       
     mouthProtectionWinow = QtWidgets.QMainWindow()   
