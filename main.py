@@ -127,6 +127,13 @@ class MouthProtectionApp():
         font5 = QtGui.QFont()
         font5.setBold(True)
         font5.setWeight(75)
+        #font6: Logger Text
+        font6 = QtGui.QFont()
+        font6.setFamily(u"Arial")
+        font6.setPointSize(8)
+        font6.setBold(False)
+        font6.setItalic(False)
+        font6.setWeight(9)
 
         ## Main Window
         mouthProtectionWinow.setWindowIcon(QtGui.QIcon("resources/favicon.ico"))
@@ -173,7 +180,7 @@ class MouthProtectionApp():
         self.textEdit = QtWidgets.QTextEdit(self.footer_widget)
         self.textEdit.setObjectName(u"textEdit")
         self.textEdit.setGeometry(QtCore.QRect(25, 36, 1541, 61))
-        self.textEdit.setFont(font1)
+        self.textEdit.setFont(font6)
         self.textEdit.setStyleSheet(u"background-color: rgb(255, 255, 255);\n"
 "color: rgb(0, 0, 0);\n"
 "font: 9pt \"Segoe UI\";\n"
@@ -509,12 +516,9 @@ class MouthProtectionApp():
 
         # Updating frames within loop
         self.timer = QTimer(mouthProtectionWinow)      
-        if (self.plc_type == "Siemens"):
-            self.timer.timeout.connect(self.update_video_SiemensPlc)
-            self.timer.start(5)        # update frame every (1000//(self.ps = 1000)  = 1 ms)   second(s)
-        elif (self.plc_type == "AllenBradly"):
-            self.timer.timeout.connect(self.update_video_AllenBradlyPlc)  
-            self.timer.start(1000 // self.fps)        
+        self.timer.timeout.connect(self.update_video)
+        self.timer.start(5)        # update frame every (1000//(self.ps = 1000)  = 1 ms)   second(s)
+     
 
 
     def retranslateUi(self, MainWindow):
@@ -620,117 +624,122 @@ class MouthProtectionApp():
         self.cap.set(cv2.CAP_PROP_FPS, 20)
     
     
+    def update_video(self):
+        if self.save_configuration == True:
+            if self.plc_type == "Siemens":
+                self.update_video_SiemensPlc()
+            elif self.plc_type == "Allen Bradly":
+                self.update_video_AllenBradlyPlc()
+            
+
+    
     ### Live Video Stream Analyser: Siemens
     def update_video_SiemensPlc(self):
-        # if True:    
-        if self.save_configuration == True:
-                start_time = time.time()
-                self.plc_ip_address = self.plcIp_text.text()   
-                
-                # Reading variables from the plc
-                self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
-                self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
-                self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
-                
-                # # Watchdog Management 
-                # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-                #     self.watchdog_counter += 1
-                # else:
-                #     self.watchdog_counter = 0  
-                
-                # if self.watchdog_counter > 100:
-                #     print("Communication Error!")  
-                #     self.Plc_Jetson_Communication = False
-                #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # else:
-                #     print("Communication Okay!")        
-                #     self.Plc_Jetson_Communication = True
-                #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-                # self.ToPlc_Watchdog = self.FromPlc_Watchdog   
-                
-                #   Wrinting output to PLC    
-                # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean)))     
-                
-                # updating the time and date
-                current_datetime = QDateTime.currentDateTime()   
-                self.dateTimeEdit.setDateTime(current_datetime)
-                                
-                # Read a frame from the stream
-                ret, frame = self.cap.read()
-                if ret:
-                        print("---------------------------------------------------------------------------------------------------------------")
-                        image = self.process_frame(frame)                       
-                        # Display the processed frame and variables in the GUI   
-                        self.display_frame(image)     
-                        end_time = time.time()      
-                        # Modify the frame and calculate result and reference_time as needed
-                        reference_time = "Reference Time:                {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
-                        print(reference_time)
-                        self.display_variables(reference_time)       
+        start_time = time.time()
+        self.plc_ip_address = self.plcIp_text.text()   
+        
+        # Reading variables from the plc
+        self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
+        self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
+        self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
+        
+        # # Watchdog Management 
+        # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
+        #     self.watchdog_counter += 1
+        # else:
+        #     self.watchdog_counter = 0  
+        
+        # if self.watchdog_counter > 100:
+        #     print("Communication Error!")  
+        #     self.Plc_Jetson_Communication = False
+        #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+        #     brush.setStyle(QtCore.Qt.NoBrush)
+        #     comm_item = self.visionVariables_widget_table.item(1, 0)
+        #     comm_item.setForeground(brush)
+        # else:
+        #     print("Communication Okay!")        
+        #     self.Plc_Jetson_Communication = True
+        #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+        #     brush.setStyle(QtCore.Qt.NoBrush)
+        #     comm_item = self.visionVariables_widget_table.item(1, 0)
+        #     comm_item.setForeground(brush)
+        # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
+        # self.ToPlc_Watchdog = self.FromPlc_Watchdog   
+        
+        #   Wrinting output to PLC    
+        # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean)))     
+        
+        # updating the time and date
+        current_datetime = QDateTime.currentDateTime()   
+        self.dateTimeEdit.setDateTime(current_datetime)
+                        
+        # Read a frame from the stream
+        ret, frame = self.cap.read()
+        if ret:
+                print("---------------------------------------------------------------------------------------------------------------")
+                image = self.process_frame(frame)                       
+                # Display the processed frame and variables in the GUI   
+                self.display_frame(image)     
+                end_time = time.time()      
+                # Modify the frame and calculate result and reference_time as needed
+                reference_time = "Reference Time:        {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
+                print(reference_time)
+                self.display_variables(reference_time)       
 
 
 
     ### Live Video Stream Analyser: Allen Bradly
     def update_video_AllenBradlyPlc(self):
-        # if True:    
-        if self.save_configuration == True:
-            start_time = time.time()
-            self.plc_ip_address = self.plcIp_text.text()    
+        start_time = time.time()
+        self.plc_ip_address = self.plcIp_text.text()    
+        
+        with LogixDriver(self.plc_ip_address) as plc:
+            self.plc = plc
+            # Reading variables from the plc
+            self.mouth_door_tag = (plc.read('Mouth_Door')).value  # Reading the value "Raspi".TO.Watchdog  from plc
+            self.extrusion_tag = (plc.read('Extrusion_Run')).value  # Reading the value "Raspi".TO.Watchdog  from plc
+            self.heartbeat_tag = (plc.read('Heart_Beat')).value  # Reading the value "Raspi".TO.Watchdog  from plc
             
-            with LogixDriver(self.plc_ip_address) as plc:
-                self.plc = plc
-                # Reading variables from the plc
-                WatchdogFromPlc = (plc.read('Mouth_Door')).value  # Reading the value "Raspi".TO.Watchdog  from plc
-                WatchdogFromPlc = (plc.read('Extrusion_Run')).value  # Reading the value "Raspi".TO.Watchdog  from plc
-                WatchdogFromPlc = (plc.read('Heart_Beat')).value  # Reading the value "Raspi".TO.Watchdog  from plc
+            # updating the time and date
+            current_datetime = QDateTime.currentDateTime()      
+            self.dateTimeEdit.setDateTime(current_datetime)
+            
+            # # Watchdog Management 
+            # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
+            #     self.watchdog_counter += 1
+            # else:
+            #     self.watchdog_counter = 0  
                 
-                # updating the time and date
-                current_datetime = QDateTime.currentDateTime()      
-                self.dateTimeEdit.setDateTime(current_datetime)
-                
-                # # Watchdog Management 
-                # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-                #     self.watchdog_counter += 1
-                # else:
-                #     self.watchdog_counter = 0  
-                    
-                # if self.watchdog_counter > 100:
-                #     print("Communication Error!")  
-                #     self.Plc_Jetson_Communication = False
-                #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # else:
-                #     print("Communication Okay!")        
-                #     self.Plc_Jetson_Communication = True
-                #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-                #     brush.setStyle(QtCore.Qt.NoBrush)
-                #     comm_item = self.visionVariables_widget_table.item(1, 0)
-                #     comm_item.setForeground(brush)
-                # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-                # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
-                
-                
-                # Read a frame from the stream
-                ret, frame = self.cap.read()
-                if ret:
-                        print("---------------------------------------------------------------------------------------------------------------")
-                        image = self.process_frame(frame)                       
-                        # Display the processed frame and variables in the GUI   
-                        self.display_frame(image)     
-                        end_time = time.time()      
-                        # Modify the frame and calculate result and reference_time as needed
-                        reference_time = "Reference Time:                {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
-                        print(reference_time)
-                        self.display_variables(reference_time)       
+            # if self.watchdog_counter > 100:
+            #     print("Communication Error!")  
+            #     self.Plc_Jetson_Communication = False
+            #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+            #     brush.setStyle(QtCore.Qt.NoBrush)
+            #     comm_item = self.visionVariables_widget_table.item(1, 0)
+            #     comm_item.setForeground(brush)
+            # else:
+            #     print("Communication Okay!")        
+            #     self.Plc_Jetson_Communication = True
+            #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
+            #     brush.setStyle(QtCore.Qt.NoBrush)
+            #     comm_item = self.visionVariables_widget_table.item(1, 0)
+            #     comm_item.setForeground(brush)
+            # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
+            # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
+            
+            
+            # Read a frame from the stream
+            ret, frame = self.cap.read()
+            if ret:
+                    print("---------------------------------------------------------------------------------------------------------------")
+                    image = self.process_frame(frame)                       
+                    # Display the processed frame and variables in the GUI   
+                    self.display_frame(image)     
+                    end_time = time.time()      
+                    # Modify the frame and calculate result and reference_time as needed
+                    reference_time = "Reference Time:        {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
+                    print(reference_time)
+                    self.display_variables(reference_time)       
                 
             
 
@@ -793,7 +802,7 @@ class MouthProtectionApp():
     # Display variables Function 
     def display_variables(self, reference_time):    
         pass        
-        self.textEdit.setText(f"------------------------------------------------------------------------------------------------------------------------------------------------------------------\n. {reference_time}\n. PLC ({self.plc_type}:{self.plc_ip_address}) \n------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        self.textEdit.setText(f"------------------------------------------------------------------------------------------------------------------------------------------------------------------\n. {reference_time}\n. PLC ({self.plc_type}:{ self.plc_ip_address}) \n------------------------------------------------------------------------------------------------------------------------------------------------------------------")
         self.mouthDoorTag_text.setText(str(self.mouth_door_tag))   
         self.extrusionTag_text.setText(str(self.extrusion_tag))           
         self.heartbeatTag_text.setText(str(self.heartbeat_tag))
