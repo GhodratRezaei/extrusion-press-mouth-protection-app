@@ -1,3 +1,6 @@
 mouthProtectionApp_RemoteRepository_Password/
 myenv/
 help/
+main.spec
+dist/
+build/

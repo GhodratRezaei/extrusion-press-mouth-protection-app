@@ -35,6 +35,7 @@ class MouthProtectionApp():
         self.folder_dir = ""
         self.record_timer_limit = 300  # 5 (min) = 300 (s) 
         self.first_auto_record_img = True
+        self.recording = False
 
         # Plc Communication 
         self.plc_type = plc_type
@@ -66,7 +67,6 @@ class MouthProtectionApp():
         self.danieli_logo_image = cv2.imread("resources\logo.jpg")
         self.danieli_icon =  "READ the ICON HERE."
         
- 
 
     def initCommunication(self):    
         self.plc_type = str(self.comboBox.currentText())
@@ -88,7 +88,6 @@ class MouthProtectionApp():
                 else:
                     print("Failed to connect to the Allen Bradly PLC.")
             
-        
         
     def initUI(self,mouthProtectionWinow):
         ## Fonts:
@@ -130,7 +129,7 @@ class MouthProtectionApp():
         #font6: Logger Text
         font6 = QtGui.QFont()
         font6.setFamily(u"Arial")
-        font6.setPointSize(8)
+        font6.setPointSize(7)
         font6.setBold(False)
         font6.setItalic(False)
         font6.setWeight(9)
@@ -436,6 +435,15 @@ class MouthProtectionApp():
         self.plctype_label.setStyleSheet(u"color: rgb(0, 0, 0);\n"
 "border-color: rgb(220, 220, 240);")
         self.plctype_label.setAlignment(Qt.AlignCenter)
+        self.mouthDoorTagLED = QLabel(self.setting_frame)
+        self.mouthDoorTagLED.setObjectName(u"mouthDoorTagLED")
+        self.mouthDoorTagLED.setGeometry(QtCore.QRect(680, 387, 71, 30))
+        self.extrusionTagLED = QLabel(self.setting_frame)
+        self.extrusionTagLED.setObjectName(u"extrusionTagLED")
+        self.extrusionTagLED.setGeometry(QtCore.QRect(680, 462, 71, 30))
+        self.HeartbeatTagLED = QLabel(self.setting_frame)
+        self.HeartbeatTagLED.setObjectName(u"HeartbeatTagLED")
+        self.HeartbeatTagLED.setGeometry(QtCore.QRect(680, 540, 71, 30))
         self.saveConf_label = QLabel(self.setting_widget)
         self.saveConf_label.setObjectName(u"saveConf_label")
         self.saveConf_label.setGeometry(QtCore.QRect(290, 651, 201, 41))
@@ -565,6 +573,9 @@ class MouthProtectionApp():
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">ukjjojkuj,</p></body></html>", None))
         self.saveCong_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Save Configuration", None))
         self.saveConf_label.setText("")
+        self.mouthDoorTagLED.setText("")
+        self.extrusionTagLED.setText("")
+        self.HeartbeatTagLED.setText("")
         
 
     # Reading Tags's Values in PLC
@@ -642,36 +653,6 @@ class MouthProtectionApp():
         self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
         self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
         self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
-        
-        # # Watchdog Management 
-        # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-        #     self.watchdog_counter += 1
-        # else:
-        #     self.watchdog_counter = 0  
-        
-        # if self.watchdog_counter > 100:
-        #     print("Communication Error!")  
-        #     self.Plc_Jetson_Communication = False
-        #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # else:
-        #     print("Communication Okay!")        
-        #     self.Plc_Jetson_Communication = True
-        #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-        #     brush.setStyle(QtCore.Qt.NoBrush)
-        #     comm_item = self.visionVariables_widget_table.item(1, 0)
-        #     comm_item.setForeground(brush)
-        # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-        # self.ToPlc_Watchdog = self.FromPlc_Watchdog   
-        
-        #   Wrinting output to PLC    
-        # self.ToPlc_Watchdog_Node.set_value(ua.DataValue(ua.Variant(self.ToPlc_Watchdog, ua.VariantType.Boolean)))     
-        
-        # updating the time and date
-        current_datetime = QDateTime.currentDateTime()   
-        self.dateTimeEdit.setDateTime(current_datetime)
                         
         # Read a frame from the stream
         ret, frame = self.cap.read()
@@ -682,8 +663,8 @@ class MouthProtectionApp():
                 self.display_frame(image)     
                 end_time = time.time()      
                 # Modify the frame and calculate result and reference_time as needed
-                reference_time = "Reference Time:        {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
-                print(reference_time)
+                reference_time = end_time - start_time 
+                print("Reference Time:        {:.3f} (seconds)".format(reference_time))
                 self.display_variables(reference_time)       
 
 
@@ -700,34 +681,6 @@ class MouthProtectionApp():
             self.extrusion_tag = (plc.read('Extrusion_Run')).value  # Reading the value "Raspi".TO.Watchdog  from plc
             self.heartbeat_tag = (plc.read('Heart_Beat')).value  # Reading the value "Raspi".TO.Watchdog  from plc
             
-            # updating the time and date
-            current_datetime = QDateTime.currentDateTime()      
-            self.dateTimeEdit.setDateTime(current_datetime)
-            
-            # # Watchdog Management 
-            # if self.FromPlc_Watchdog == self.WatchdogFromPlcMem:    
-            #     self.watchdog_counter += 1
-            # else:
-            #     self.watchdog_counter = 0  
-                
-            # if self.watchdog_counter > 100:
-            #     print("Communication Error!")  
-            #     self.Plc_Jetson_Communication = False
-            #     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-            #     brush.setStyle(QtCore.Qt.NoBrush)
-            #     comm_item = self.visionVariables_widget_table.item(1, 0)
-            #     comm_item.setForeground(brush)
-            # else:
-            #     print("Communication Okay!")        
-            #     self.Plc_Jetson_Communication = True
-            #     brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))   # set the jetson-plc-communication cell font to gray rgb (128,128,128) 
-            #     brush.setStyle(QtCore.Qt.NoBrush)
-            #     comm_item = self.visionVariables_widget_table.item(1, 0)
-            #     comm_item.setForeground(brush)
-            # self.WatchdogFromPlcMem = self.FromPlc_Watchdog    
-            # self.ToPlc_Watchdog = self.FromPlc_Watchdog       
-            
-            
             # Read a frame from the stream
             ret, frame = self.cap.read()
             if ret:
@@ -737,13 +690,32 @@ class MouthProtectionApp():
                     self.display_frame(image)     
                     end_time = time.time()      
                     # Modify the frame and calculate result and reference_time as needed
-                    reference_time = "Reference Time:        {:.3f} (seconds)".format(end_time - start_time )  # Replace with actual reference time
-                    print(reference_time)
-                    self.display_variables(reference_time)       
+                    reference_time = end_time - start_time 
+                    print("Reference Time:        {:.3f} (seconds)".format(reference_time))
+                    self.display_variables(reference_time)        
                 
             
 
     def process_frame(self, frame):    
+        # updating the time and date
+        current_datetime = QDateTime.currentDateTime()      
+        self.dateTimeEdit.setDateTime(current_datetime)
+        
+        if self.mouth_door_tag == True:
+            self.mouthDoorTagLED.setStyleSheet("background-color: green; border-radius: 15px;")
+        else:
+            self.mouthDoorTagLED.setStyleSheet("background-color: red; border-radius: 15px;")
+        
+        if self.extrusion_tag == True:
+            self.extrusionTagLED.setStyleSheet("background-color: green; border-radius: 15px;")
+        else:
+            self.extrusionTagLED.setStyleSheet("background-color: red; border-radius: 15px;")    
+        
+        if self.heartbeat_tag == True:
+            self.HeartbeatTagLED.setStyleSheet("background-color: green; border-radius: 15px;")
+        else:
+            self.HeartbeatTagLED.setStyleSheet("background-color: red; border-radius: 15px;")     
+        
         
         image = cv2.resize(frame, (691, 641))   # resize to the defined image_size        
         print(f"Manual Start: {self.manl_start_record}, Manual stop: {self.manl_stop_record}")
@@ -752,11 +724,13 @@ class MouthProtectionApp():
         # Manual Recording
         if (self.manl_start_record == True) & (self.manl_stop_record == False):
             print("*****************************   Manual Recording is happening ")
+            self.recording = True
             print("Writting Enable.") 
             self.manl_out.write(image)
         
         if self.manl_stop_record == True:
             self.manl_out.release()
+            self.recording = False
             self.manl_start_record = False     
         
         
@@ -774,6 +748,7 @@ class MouthProtectionApp():
                 self.auto_out = cv2.VideoWriter(self.auto_video_path,self.auto_fourcc, 20,  (691, 641)) 
                 self.first_auto_record_img = False
             print("*****************************   Auto Recording is happening ")
+            self.recording = True
             print("Writting Enable.") 
             self.auto_out.write(image)     
 
@@ -783,6 +758,7 @@ class MouthProtectionApp():
                     self.auto_stop_record = True
                     self.auto_out.release()
                     self.first_auto_record_img = True
+                    self.recording = False
         
         return image
     
@@ -802,20 +778,19 @@ class MouthProtectionApp():
     # Display variables Function 
     def display_variables(self, reference_time):    
         pass        
-        self.textEdit.setText(f"------------------------------------------------------------------------------------------------------------------------------------------------------------------\n. {reference_time}\n. PLC ({self.plc_type}:{ self.plc_ip_address}) \n------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        self.textEdit.setText(" Reference time:    {:.3f}\nPLC {}:    {} \n " 
+                               "Recording Status:    {}".format(reference_time, self.plc_type, self.plc_ip_address, self.recording))
         self.mouthDoorTag_text.setText(str(self.mouth_door_tag))   
         self.extrusionTag_text.setText(str(self.extrusion_tag))           
         self.heartbeatTag_text.setText(str(self.heartbeat_tag))
         
-
-
 
     def closeEvent(self, event):  
         self.video_capture.release()
         event.accept()      
 
 
-#***********************************************************************************************************************************************************************************************************
+#********************************************************************************************************************************************************
 def main():
     
     video_dir = "" 

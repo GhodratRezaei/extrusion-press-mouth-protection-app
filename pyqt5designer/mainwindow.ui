@@ -607,9 +607,9 @@ border-color: rgb(220, 220, 240);</string>
       <widget class="QLineEdit" name="mouthDoorTag_text">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>30</x>
          <y>387</y>
-         <width>731</width>
+         <width>721</width>
          <height>30</height>
         </rect>
        </property>
@@ -850,6 +850,45 @@ border-color: rgb(220, 220, 240);</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="mouthDoorTagLED">
+       <property name="geometry">
+        <rect>
+         <x>680</x>
+         <y>387</y>
+         <width>71</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="extrusionTagLED">
+       <property name="geometry">
+        <rect>
+         <x>680</x>
+         <y>462</y>
+         <width>71</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="HeartbeatTagLED">
+       <property name="geometry">
+        <rect>
+         <x>680</x>
+         <y>540</y>
+         <width>71</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>
