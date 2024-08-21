@@ -204,9 +204,9 @@ border-color: rgb(220, 220, 240);</string>
      <widget class="QLabel" name="record_label">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>70</x>
         <y>630</y>
-        <width>471</width>
+        <width>651</width>
         <height>51</height>
        </rect>
       </property>
@@ -217,10 +217,10 @@ border-color: rgb(220, 220, 240);</string>
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="save_pushButton">
+     <widget class="QPushButton" name="record_pushButton">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>368</x>
         <y>640</y>
         <width>75</width>
         <height>31</height>
@@ -242,13 +242,13 @@ font: 75 12pt &quot;Arial&quot;;
 </string>
       </property>
       <property name="text">
-       <string>Save</string>
+       <string>Record</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="start_pushButton">
+     <widget class="QPushButton" name="continue_pushButton">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>455</x>
         <y>640</y>
         <width>75</width>
         <height>31</height>
@@ -260,13 +260,13 @@ font: 75 12pt &quot;Arial&quot;;
 border-color: rgb(0, 0, 0);</string>
       </property>
       <property name="text">
-       <string>Start</string>
+       <string>Continue</string>
       </property>
      </widget>
      <widget class="QPushButton" name="stop_pushButton">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>631</x>
         <y>640</y>
         <width>75</width>
         <height>31</height>
@@ -284,7 +284,7 @@ border-color: rgb(0, 0, 0);</string>
      <widget class="QPushButton" name="pause_pushButton">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>543</x>
         <y>640</y>
         <width>75</width>
         <height>31</height>
@@ -299,6 +299,32 @@ border-color: rgb(0, 0, 0);</string>
        <string>Pause</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="activtaeRecording_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>640</y>
+        <width>181</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">colo: rgb(0, 0, 0);
+font: 75 10pt &quot;MS Shell Dlg 2&quot;;
+color: rgb(0, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string>Activate Manual Recording </string>
+      </property>
+     </widget>
+     <zorder>video_title</zorder>
+     <zorder>video_label</zorder>
+     <zorder>record_label</zorder>
+     <zorder>activtaeRecording_checkBox</zorder>
+     <zorder>pause_pushButton</zorder>
+     <zorder>stop_pushButton</zorder>
+     <zorder>record_pushButton</zorder>
+     <zorder>continue_pushButton</zorder>
     </widget>
     <widget class="QWidget" name="setting_widget" native="true">
      <property name="geometry">

@@ -9,7 +9,7 @@ import os
 import cv2
 
 # PyQT5 Packages
-from PyQt5.QtWidgets import QMessageBox, QApplication, QMainWindow, QCommandLinkButton, QTabWidget, QPushButton, QVBoxLayout, QDialog, QLabel, QSizePolicy, QWidget, QLayout
+from PyQt5.QtWidgets import QMessageBox, QApplication, QMainWindow, QCommandLinkButton, QTabWidget, QPushButton, QVBoxLayout, QDialog, QLabel, QSizePolicy, QWidget, QLayout, QGraphicsBlurEffect, QInputDialog, QLineEdit
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDateTime, QTimer, Qt, QSize   
@@ -52,13 +52,13 @@ class MouthProtectionApp():
         self.manl_start_record = False
         self.manl_stop_record = False
         self.manl_pause_record = False
-        self.manl_save_record = False
+        self.manl_continue_record = False
+        
         
         # Automatic record managing
         self.auto_start_record = False
         self.auto_stop_record = False
-        self.auto_pause_record = False
-        self.auto_save_record = False
+
         
         # save configurations 
         self.save_configuration = False
@@ -133,6 +133,16 @@ class MouthProtectionApp():
         font6.setBold(False)
         font6.setItalic(False)
         font6.setWeight(9)
+        # Blur effect for the pushbutton
+        self.blur_effect_record = QGraphicsBlurEffect()
+        self.blur_effect_record.setBlurRadius(2)
+        self.blur_effect_continue = QGraphicsBlurEffect()
+        self.blur_effect_continue.setBlurRadius(2)
+        self.blur_effect_pause = QGraphicsBlurEffect()
+        self.blur_effect_pause.setBlurRadius(2)
+        self.blur_effect_stop = QGraphicsBlurEffect()
+        self.blur_effect_stop.setBlurRadius(2)
+        
 
         ## Main Window
         mouthProtectionWinow.setWindowIcon(QtGui.QIcon("resources/favicon.ico"))
@@ -214,14 +224,14 @@ class MouthProtectionApp():
         self.video_label.setStyleSheet(u"color: rgb(0, 0, 0);")
         self.record_label = QLabel(self.video_widget)
         self.record_label.setObjectName(u"record_label")
-        self.record_label.setGeometry(QtCore.QRect(170, 630, 471, 51))
+        self.record_label.setGeometry(QtCore.QRect(70, 630, 651, 51))
         self.record_label.setStyleSheet(u"background-color: rgb(255, 255, 255);")
-        self.save_pushButton = QPushButton(self.video_widget)
-        self.save_pushButton.setObjectName(u"save_pushButton")
-        self.save_pushButton.setGeometry(QtCore.QRect(190, 640, 75, 31))
-        self.save_pushButton.setFont(font2)
+        self.record_pushButton = QPushButton(self.video_widget)
+        self.record_pushButton.setObjectName(u"record_pushButton")
+        self.record_pushButton.setGeometry(QtCore.QRect(368, 640, 75, 31))
+        self.record_pushButton.setFont(font2)
         # Set the style for normal and hover state
-        self.save_pushButton.setStyleSheet("""
+        self.record_pushButton.setStyleSheet("""
             QPushButton {
                 color: rgb(0, 0, 0);
                 font: 75 12pt \"Arial\";
@@ -231,13 +241,17 @@ class MouthProtectionApp():
                 background-color: lightblue;
             }
         """)
-        self.save_pushButton.clicked.connect(self.__on_save_button)
+        self.record_pushButton.clicked.connect(self.__on_record_button)
+        # Apply blur effect and disable the button
+        self.record_pushButton.setGraphicsEffect(self.blur_effect_record)
+        self.record_pushButton.setEnabled(False)
+
         
-        self.start_pushButton = QPushButton(self.video_widget)
-        self.start_pushButton.setObjectName(u"start_pushButton")
-        self.start_pushButton.setGeometry(QtCore.QRect(310, 640, 75, 31))
+        self.continue_pushButton = QPushButton(self.video_widget)
+        self.continue_pushButton.setObjectName(u"continue_pushButton")
+        self.continue_pushButton.setGeometry(QtCore.QRect(455, 640, 75, 31))
         # Set the style for normal and hover state
-        self.start_pushButton.setStyleSheet("""
+        self.continue_pushButton.setStyleSheet("""
             QPushButton {
                 color: rgb(0, 0, 0);
                 font: 75 12pt \"Arial\";
@@ -247,11 +261,15 @@ class MouthProtectionApp():
                 background-color: lightblue;
             }
         """)
-        self.start_pushButton.clicked.connect(self.__on_start_button)
+        self.continue_pushButton.clicked.connect(self.__on_continue_button)
+        # Apply blur effect and disable the button
+        self.continue_pushButton.setGraphicsEffect(self.blur_effect_continue)
+        self.continue_pushButton.setEnabled(False)
+
 
         self.stop_pushButton = QPushButton(self.video_widget)
         self.stop_pushButton.setObjectName(u"stop_pushButton")
-        self.stop_pushButton.setGeometry(QtCore.QRect(550, 640, 75, 31))
+        self.stop_pushButton.setGeometry(QtCore.QRect(631, 640, 75, 31))
         # Set the style for normal and hover state
         self.stop_pushButton.setStyleSheet("""
             QPushButton {
@@ -264,10 +282,13 @@ class MouthProtectionApp():
             }
         """)
         self.stop_pushButton.clicked.connect(self.__on_stop_button)
+        # Apply blur effect and disable the button
+        self.stop_pushButton.setGraphicsEffect(self.blur_effect_stop)
+        self.stop_pushButton.setEnabled(False)
         
         self.pause_pushButton = QPushButton(self.video_widget)
         self.pause_pushButton.setObjectName(u"pause_pushButton")
-        self.pause_pushButton.setGeometry(QtCore.QRect(430, 640, 75, 31))
+        self.pause_pushButton.setGeometry(QtCore.QRect(543, 640, 75, 31))
         # Set the style for normal and hover state
         self.pause_pushButton.setStyleSheet("""
             QPushButton {
@@ -280,6 +301,19 @@ class MouthProtectionApp():
             }
         """)
         self.pause_pushButton.clicked.connect(self.__on_pause_button)
+        # Apply blur effect and disable the button
+        self.pause_pushButton.setGraphicsEffect(self.blur_effect_pause)
+        self.pause_pushButton.setEnabled(False)
+
+        
+        self.activtaeRecording_checkBox = QtWidgets.QCheckBox(self.video_widget)
+        self.activtaeRecording_checkBox.setObjectName(u"activtaeRecording_checkBox")
+        self.activtaeRecording_checkBox.setGeometry(QtCore.QRect(90, 640, 181, 31))
+        self.activtaeRecording_checkBox.setStyleSheet(u"colo: rgb(0, 0, 0);\n"
+"font: 75 10pt \"MS Shell Dlg 2\";\n"
+"color: rgb(0, 0, 0);")
+        # # Connect the checkbox stateChanged signal to the slot
+        # self.activtaeRecording_checkBox.stateChanged.connect(self.show_password_dialog)
         
         
         # Setting_widget
@@ -543,10 +577,11 @@ class MouthProtectionApp():
         self.video_title.setText(_translate("Danieli Mouth Protectoion Application", u"Live View", None))
         # self.video_label.setText(_translate("Danieli Mouth Protectoion Application", u"put here the live video frame", None))
         self.record_label.setText("")
-        self.save_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Save", None))
-        self.start_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Start", None))
+        self.record_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Record", None))
+        self.continue_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Continue", None))
         self.stop_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Stop", None))
         self.pause_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Pause", None))
+        self.activtaeRecording_checkBox.setText(_translate("Danieli Mouth Protectoion Application", u"Activate Manual Recording ", None))
         self.setting_title.setText(_translate("Danieli Mouth Protectoion Application", u"Settings", None))
         self.cameraUrl_label.setText(_translate("Danieli Mouth Protectoion Application", u"Camera URL", None))
         self.cameraUrl_line.setText("rtsp://192.168.1.100:554/stream2")
@@ -578,6 +613,20 @@ class MouthProtectionApp():
         self.HeartbeatTagLED.setText("")
         
 
+    # def show_password_dialog(self, state):
+    #     if state == 2:  # Checkbox is checked
+    #         # Show a password input dialog
+    #         password, ok = QInputDialog.getText(self, "Enter Password", "Password:")
+            
+    #         if ok and password:
+    #             QMessageBox.information(self, "Password Entered", "Password accepted.")
+    #         else:
+    #             # Uncheck the checkbox if no password is entered or dialog is cancelled
+    #             self.checkbox.setChecked(False)
+    #     else:
+    #         QMessageBox.information(self, "Checkbox Unchecked", "Checkbox was unchecked.")
+                    
+
     # Reading Tags's Values in PLC
     def ReadDataBlock(self, plc, data_block_number, byte, bit, size, data_type):
         """
@@ -598,29 +647,42 @@ class MouthProtectionApp():
             return get_real(result, 0)  
         elif data_type == S7WLDWord:
             return get_word(result, 0)
+        elif data_type == S7WLDInt:
+            return get_dint(result, 0)
         else:
             return None  
 
 
-    def __on_start_button(self):
+    def __on_record_button(self):
         self.manl_start_record = True
         self.manl_stop_record = False
         # Defining for the Video Recorder   
         self.manl_fourcc = cv2.VideoWriter_fourcc(*'XVID')    
         start_record_time = str(datetime.now()).replace(":", "").replace(" ", "_")  
-        print(self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi")
-        self.manl_video_path = self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi"     
+        print(self.folder_dir + "/" + "Die" + str(self.dieCode_tag) + "_" + "Billet" + str(self.billetNumber_tag) + "_" + start_record_time[:17 ] + ".avi")
+        self.manl_video_path = self.folder_dir + "/" + "Die" + str(self.dieCode_tag) + "_" + "Billet" + str(self.billetNumber_tag) + "_" + start_record_time[:17 ] + ".avi"    
         self.manl_out = cv2.VideoWriter(self.manl_video_path,self.manl_fourcc, 20,  (691, 641))
 
     def __on_stop_button(self):
         self.manl_stop_record = True
         self.manl_start_record = False
+        self.manl_pause_record = False
+        self.manl_continue_record = False
             
-    def __on_save_button(self):
-        self.manl_save_record = True
-    
+    def __on_continue_button(self):
+        self.manl_continue_record = True
+        self.manl_pause_record = False
+        self.manl_start_record = True
+        self.recording = True
+
     def __on_pause_button(self):
         self.manl_pause_record = True
+        self.manl_continue_record = False  
+        self.manl_start_record = False
+        self.recording = False
+
+
+
 
     def __on_saveConf_button(self):
         self.save_configuration = True   
@@ -636,6 +698,39 @@ class MouthProtectionApp():
     
     
     def update_video(self):
+        # Activate Manual Recording
+        if int(self.activtaeRecording_checkBox.checkState()) ==  2:   # 2: True, 0: False
+            self.record_pushButton.setGraphicsEffect(None)
+            self.continue_pushButton.setGraphicsEffect(None)
+            self.pause_pushButton.setGraphicsEffect(None)
+            self.stop_pushButton.setGraphicsEffect(None)
+            # Enabling recording pushbuttons
+            self.record_pushButton.setEnabled(True)
+            self.continue_pushButton.setEnabled(True)
+            self.pause_pushButton.setEnabled(True)
+            self.stop_pushButton.setEnabled(True)
+        # Deactivate Manual Recording     
+        else:
+            # Blur effect for the pushbutton
+            self.blur_effect_record = QGraphicsBlurEffect()
+            self.blur_effect_record.setBlurRadius(2)
+            self.blur_effect_continue = QGraphicsBlurEffect()
+            self.blur_effect_continue.setBlurRadius(2)
+            self.blur_effect_pause = QGraphicsBlurEffect()
+            self.blur_effect_pause.setBlurRadius(2)
+            self.blur_effect_stop = QGraphicsBlurEffect()
+            self.blur_effect_stop.setBlurRadius(2)
+            self.record_pushButton.setGraphicsEffect(self.blur_effect_record)
+            self.continue_pushButton.setGraphicsEffect(self.blur_effect_continue)
+            self.pause_pushButton.setGraphicsEffect(self.blur_effect_pause)
+            self.stop_pushButton.setGraphicsEffect(self.blur_effect_stop)
+            # Disabling recording pushbuttons
+            self.record_pushButton.setEnabled(False)
+            self.continue_pushButton.setEnabled(False)
+            self.pause_pushButton.setEnabled(False)
+            self.stop_pushButton.setEnabled(False)
+            
+                    
         if self.save_configuration == True:
             if self.plc_type == "Siemens":
                 self.update_video_SiemensPlc()
@@ -653,8 +748,15 @@ class MouthProtectionApp():
         self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
         self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
         self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
+        self.dieCode_tag = self.ReadDataBlock(self.client, 63, 2, 0, 4, S7WLDInt) 
+        self.billetNumber_tag = self.ReadDataBlock(self.client, 63, 6, 0, 4, S7WLDInt) 
+        
+        
+        
+        print("/////////////////////////", self.dieCode_tag, self.billetNumber_tag)
+        
                         
-        # Read a frame from the stream
+        # Read a frame from the stream 
         ret, frame = self.cap.read()
         if ret:
                 print("---------------------------------------------------------------------------------------------------------------")
@@ -731,7 +833,16 @@ class MouthProtectionApp():
         if self.manl_stop_record == True:
             self.manl_out.release()
             self.recording = False
-            self.manl_start_record = False     
+            self.manl_start_record = False
+        
+        if self.manl_pause_record == True:
+            self.recording = False
+
+        if self.manl_continue_record == True:
+            self.recording = True
+
+
+                
         
         
         # Automatic Recording
@@ -743,8 +854,8 @@ class MouthProtectionApp():
                 # Defining for the Video Recorder   
                 self.auto_fourcc = cv2.VideoWriter_fourcc(*'XVID')    
                 start_record_time = str(datetime.now()).replace(":", "").replace(" ", "_")  
-                print(self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi")
-                self.auto_video_path = self.folder_dir + "/Recorded_videos_" + start_record_time[:17 ] + ".avi"     
+                print(self.folder_dir + "/" + "Die" + str(self.dieCode_tag) + "_" + "Billet" + str(self.billetNumber_tag) + "_" + start_record_time[:17 ] + ".avi")
+                self.auto_video_path = self.folder_dir + "/" + "Die" + str(self.dieCode_tag) + "_" + "Billet" + str(self.billetNumber_tag) + "_" + start_record_time[:17 ] + ".avi"     
                 self.auto_out = cv2.VideoWriter(self.auto_video_path,self.auto_fourcc, 20,  (691, 641)) 
                 self.first_auto_record_img = False
             print("*****************************   Auto Recording is happening ")
@@ -778,7 +889,7 @@ class MouthProtectionApp():
     # Display variables Function 
     def display_variables(self, reference_time):    
         pass        
-        self.textEdit.setText(" Reference time:    {:.3f}\nPLC {}:    {} \n " 
+        self.textEdit.setText(" Reference time:    {:.3f}\n PLC {}:    {} \n " 
                                "Recording Status:    {}".format(reference_time, self.plc_type, self.plc_ip_address, self.recording))
         self.mouthDoorTag_text.setText(str(self.mouth_door_tag))   
         self.extrusionTag_text.setText(str(self.extrusion_tag))           
