@@ -70,12 +70,19 @@ class MouthProtectionApp():
 
     def initCommunication(self):    
         self.plc_type = str(self.comboBox.currentText())
+        self.plc_ip_address = self.plcIp_text.text()   
+
         # Siemens PLC 
         try:        
             if (self.plc_type == "Siemens"):    
                 self.client = snap7.client.Client()
                 self.client.connect(self.plcIp_text.text(), 0, 1) 
                 print("Connection to Siemens PLC is okay!")
+                self.plc_connection = True
+            else: 
+                self.client = LogixDriver(self.plcIp_text.text())
+                self.client.__enter__()  # Explicitly enter the context
+                print("Connection to AllenBradly PLC is okay!")
                 self.plc_connection = True
         except Exception as e:
             print(f"Error:   {e}")  
@@ -730,19 +737,20 @@ class MouthProtectionApp():
             self.pause_pushButton.setEnabled(False)
             self.stop_pushButton.setEnabled(False)
             
-                    
         if self.save_configuration == True:
             if self.plc_type == "Siemens":
                 self.update_video_SiemensPlc()
             elif self.plc_type == "Allen Bradly":
                 self.update_video_AllenBradlyPlc()
+                if not self.client:
+                    self.client.__exit__(None, None, None)  # Ensure resources are released
+                
             
 
     
     ### Live Video Stream Analyser: Siemens
     def update_video_SiemensPlc(self):
         start_time = time.time()
-        self.plc_ip_address = self.plcIp_text.text()   
         
         # Reading variables from the plc
         self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
@@ -750,11 +758,6 @@ class MouthProtectionApp():
         self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
         self.dieCode_tag = self.ReadDataBlock(self.client, 63, 2, 0, 4, S7WLDInt) 
         self.billetNumber_tag = self.ReadDataBlock(self.client, 63, 6, 0, 4, S7WLDInt) 
-        
-        
-        
-        print("/////////////////////////", self.dieCode_tag, self.billetNumber_tag)
-        
                         
         # Read a frame from the stream 
         ret, frame = self.cap.read()
@@ -774,27 +777,28 @@ class MouthProtectionApp():
     ### Live Video Stream Analyser: Allen Bradly
     def update_video_AllenBradlyPlc(self):
         start_time = time.time()
-        self.plc_ip_address = self.plcIp_text.text()    
         
-        with LogixDriver(self.plc_ip_address) as plc:
-            self.plc = plc
-            # Reading variables from the plc
-            self.mouth_door_tag = (plc.read('Mouth_Door')).value  # Reading the value "Raspi".TO.Watchdog  from plc
-            self.extrusion_tag = (plc.read('Extrusion_Run')).value  # Reading the value "Raspi".TO.Watchdog  from plc
-            self.heartbeat_tag = (plc.read('Heart_Beat')).value  # Reading the value "Raspi".TO.Watchdog  from plc
-            
-            # Read a frame from the stream
-            ret, frame = self.cap.read()
-            if ret:
-                    print("---------------------------------------------------------------------------------------------------------------")
-                    image = self.process_frame(frame)                       
-                    # Display the processed frame and variables in the GUI   
-                    self.display_frame(image)     
-                    end_time = time.time()      
-                    # Modify the frame and calculate result and reference_time as needed
-                    reference_time = end_time - start_time 
-                    print("Reference Time:        {:.3f} (seconds)".format(reference_time))
-                    self.display_variables(reference_time)        
+        # with LogixDriver(self.plc_ip_address) as plc:   // comment this Line
+ 
+        # Reading variables from the plc
+        self.mouth_door_tag = (self.client.read('Mouth_Door')).value  
+        self.extrusion_tag = (self.client.read('Extrusion_Run')).value  
+        self.heartbeat_tag = (self.client.read('Heart_Beat')).value  
+        self.dieCode_tag = (self.client.read('Die_Code')).value  
+        self.billetNumber_tag = (self.client.read('Billet_Number')).value  
+        
+        # Read a frame from the stream
+        ret, frame = self.cap.read()
+        if ret:
+                print("---------------------------------------------------------------------------------------------------------------")
+                image = self.process_frame(frame)                       
+                # Display the processed frame and variables in the GUI   
+                self.display_frame(image)     
+                end_time = time.time()      
+                # Modify the frame and calculate result and reference_time as needed
+                reference_time = end_time - start_time 
+                print("Reference Time:        {:.3f} (seconds)".format(reference_time))
+                self.display_variables(reference_time)        
                 
             
 
