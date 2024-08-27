@@ -9,7 +9,7 @@ import os
 import cv2
 
 # PyQT5 Packages
-from PyQt5.QtWidgets import QMessageBox, QApplication, QMainWindow, QCommandLinkButton, QTabWidget, QPushButton, QVBoxLayout, QDialog, QLabel, QSizePolicy, QWidget, QLayout, QGraphicsBlurEffect, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QMessageBox, QApplication, QMainWindow, QMessageBox, QCommandLinkButton, QTabWidget, QPushButton, QVBoxLayout, QDialog, QLabel, QSizePolicy, QWidget, QLayout, QGraphicsBlurEffect, QInputDialog, QLineEdit
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDateTime, QTimer, Qt, QSize   
@@ -17,6 +17,7 @@ from PyQt5.uic import loadUi
 
 # Defining the plc communication packages
 from pycomm3 import LogixDriver 
+from pycomm3.exceptions import CommError
 import snap7 
 from snap7 import *
 from snap7.util import *
@@ -54,12 +55,10 @@ class MouthProtectionApp():
         self.manl_pause_record = False
         self.manl_continue_record = False
         
-        
         # Automatic record managing
         self.auto_start_record = False
         self.auto_stop_record = False
 
-        
         # save configurations 
         self.save_configuration = False
         
@@ -68,33 +67,30 @@ class MouthProtectionApp():
         self.danieli_icon =  "READ the ICON HERE."
         
 
-    def initCommunication(self):    
+    def __initCommunication(self):    
         self.plc_type = str(self.comboBox.currentText())
         self.plc_ip_address = self.plcIp_text.text()   
 
         # Siemens PLC 
-        try:        
-            if (self.plc_type == "Siemens"):    
+           
+        if (self.plc_type == "Siemens"):  
+            try:  
                 self.client = snap7.client.Client()
                 self.client.connect(self.plcIp_text.text(), 0, 1) 
                 print("Connection to Siemens PLC is okay!")
                 self.plc_connection = True
-            else: 
+            except Exception as err:
+                self.__plc_show_warning_messagebox(str(err), str(self.plc_type))
+        else: 
+            try:
                 self.client = LogixDriver(self.plcIp_text.text())
                 self.client.__enter__()  # Explicitly enter the context
                 print("Connection to AllenBradly PLC is okay!")
                 self.plc_connection = True
-        except Exception as e:
-            print(f"Error:   {e}")  
+            except CommError as err:
+                self.__plc_show_warning_messagebox(str(err), str(self.plc_type))    
              
-        # Allen Bradly
-        if (self.plc_type == "Allen Bradly"):  
-            with LogixDriver(self.plcIp_text.text()) as plc:
-                if plc.connected:
-                    print("Connection to Allen Bradly PLC is okay!")
-                else:
-                    print("Failed to connect to the Allen Bradly PLC.")
-            
+             
         
     def initUI(self,mouthProtectionWinow):
         ## Fonts:
@@ -612,7 +608,7 @@ class MouthProtectionApp():
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">ukjjojkuj,</p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p></body></html>", None))
         self.saveCong_pushButton.setText(_translate("Danieli Mouth Protectoion Application", u"Save Configuration", None))
         self.saveConf_label.setText("")
         self.mouthDoorTagLED.setText("")
@@ -688,21 +684,46 @@ class MouthProtectionApp():
         self.manl_start_record = False
         self.recording = False
 
-
-
-
     def __on_saveConf_button(self):
         self.save_configuration = True   
-        self.initCommunication()
+        self.__initCommunication()
         # Defining the recording directory
         if int(self.primPath_checkBox.checkState()) ==  2:   # 2: True, 0: False
                 self.folder_dir = self.prmRecPath_text.text()
         elif int(self.secondPath_checkBox.checkState()) ==  2:
                 self.folder_dir = self.secRecPath_text.text()
-        # Initializing the cap
+        # Initializing the caps
         self.cap = cv2.VideoCapture(self.url)  
         self.cap.set(cv2.CAP_PROP_FPS, 20)
     
+    
+    def __plc_show_warning_messagebox(self, error_string, plc_type_string): 
+        msg = QMessageBox() 
+        msg.setIcon(QMessageBox.Warning) 
+        # setting message for Message Box 
+        msg.setText(error_string + "\nPlease check again inserted properties!") 
+        # setting Message box window title 
+        msg.setWindowTitle(f"{plc_type_string} PLC Connection") 
+        # declaring buttons on Message Box 
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel) 
+        self.save_configuration = False
+        # start the app 
+        retval = msg.exec_() 
+        
+
+    def __camera_show_warning_messagebox(self):
+        msg = QMessageBox() 
+        msg.setIcon(QMessageBox.Warning) 
+        # setting message for Message Box 
+        msg.setText("Camera Connection aborted. \nPlease check again inserted properties!") 
+        # setting Message box window title 
+        msg.setWindowTitle("Camera Connection") 
+        # declaring buttons on Message Box 
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel) 
+        self.save_configuration = False
+        # start the app 
+        retval = msg.exec_()     
+        
     
     def update_video(self):
         # Activate Manual Recording
@@ -750,56 +771,68 @@ class MouthProtectionApp():
     
     ### Live Video Stream Analyser: Siemens
     def update_video_SiemensPlc(self):
-        start_time = time.time()
-        
-        # Reading variables from the plc
-        self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
-        self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
-        self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
-        self.dieCode_tag = self.ReadDataBlock(self.client, 63, 2, 0, 4, S7WLDInt) 
-        self.billetNumber_tag = self.ReadDataBlock(self.client, 63, 6, 0, 4, S7WLDInt) 
-                        
-        # Read a frame from the stream 
-        ret, frame = self.cap.read()
-        if ret:
+        try:
+            start_time = time.time()
+            
+            # Reading variables from the plc
+            self.mouth_door_tag = self.ReadDataBlock(self.client, 63, 0, 2, 1, S7WLBit)
+            self.extrusion_tag = self.ReadDataBlock(self.client, 63, 0, 3, 1, S7WLBit)           
+            self.heartbeat_tag = self.ReadDataBlock(self.client, 63, 0, 4, 1, S7WLBit) 
+            self.dieCode_tag = self.ReadDataBlock(self.client, 63, 2, 0, 4, S7WLDInt) 
+            self.billetNumber_tag = self.ReadDataBlock(self.client, 63, 6, 0, 4, S7WLDInt) 
+                            
+            # Read a frame from the stream 
+            ret, frame = self.cap.read()
+            if ret:
                 print("---------------------------------------------------------------------------------------------------------------")
                 image = self.process_frame(frame)                       
                 # Display the processed frame and variables in the GUI   
-                self.display_frame(image)     
-                end_time = time.time()      
-                # Modify the frame and calculate result and reference_time as needed
-                reference_time = end_time - start_time 
-                print("Reference Time:        {:.3f} (seconds)".format(reference_time))
-                self.display_variables(reference_time)       
-
+                self.display_frame(image)   
+            else:
+                self.__camera_show_warning_messagebox()      
+            end_time = time.time()      
+            # Modify the frame and calculate result and reference_time as needed
+            reference_time = end_time - start_time 
+            print("Reference Time:        {:.3f} (seconds)".format(reference_time))
+            self.display_variables(reference_time)       
+        except Exception as err:
+            self.__plc_show_warning_messagebox(str(err), str(self.plc_type))
+            
 
 
     ### Live Video Stream Analyser: Allen Bradly
     def update_video_AllenBradlyPlc(self):
-        start_time = time.time()
-        
-        # with LogixDriver(self.plc_ip_address) as plc:   // comment this Line
- 
-        # Reading variables from the plc
-        self.mouth_door_tag = (self.client.read('Mouth_Door')).value  
-        self.extrusion_tag = (self.client.read('Extrusion_Run')).value  
-        self.heartbeat_tag = (self.client.read('Heart_Beat')).value  
-        self.dieCode_tag = (self.client.read('Die_Code')).value  
-        self.billetNumber_tag = (self.client.read('Billet_Number')).value  
-        
-        # Read a frame from the stream
-        ret, frame = self.cap.read()
-        if ret:
+        try:
+            start_time = time.time()
+            
+            # with LogixDriver(self.plc_ip_address) as plc:   // comment this Line
+    
+            # Reading variables from the plc
+            self.mouth_door_tag = (self.client.read('Mouth_Door')).value  
+            self.extrusion_tag = (self.client.read('Extrusion_Run')).value  
+            self.heartbeat_tag = (self.client.read('Heart_Beat')).value  
+            self.dieCode_tag = (self.client.read('Die_Code')).value  
+            self.billetNumber_tag = (self.client.read('Billet_Number')).value  
+            
+            # Read a frame from the stream
+            ret, frame = self.cap.read()
+            if ret:
                 print("---------------------------------------------------------------------------------------------------------------")
                 image = self.process_frame(frame)                       
                 # Display the processed frame and variables in the GUI   
-                self.display_frame(image)     
-                end_time = time.time()      
-                # Modify the frame and calculate result and reference_time as needed
-                reference_time = end_time - start_time 
-                print("Reference Time:        {:.3f} (seconds)".format(reference_time))
-                self.display_variables(reference_time)        
-                
+                self.display_frame(image)   
+            else:
+                self.__camera_show_warning_messagebox()            
+            end_time = time.time()      
+            # Modify the frame and calculate result and reference_time as needed
+            reference_time = end_time - start_time 
+            print("Reference Time:        {:.3f} (seconds)".format(reference_time))
+            self.display_variables(reference_time)        
+        except CommError as err:
+            self.__plc_show_warning_messagebox(str(err), str(self.plc_type))
+
+            
+
             
 
     def process_frame(self, frame):    
@@ -845,10 +878,6 @@ class MouthProtectionApp():
         if self.manl_continue_record == True:
             self.recording = True
 
-
-                
-        
-        
         # Automatic Recording
         if (self.mouth_door_tag == True) & (self.extrusion_tag == True):
             if self.first_auto_record_img == True:
@@ -879,7 +908,7 @@ class MouthProtectionApp():
     
     
     
-    
+
     # display the opencv BGR image into the defined lables in Qt Designer.
     def display_frame(self, frame):  
         height, width, channel = frame.shape   
@@ -918,6 +947,7 @@ def main():
     mouthProtection.initUI(mouthProtectionWinow)
     mouthProtectionWinow.show()    
     sys.exit(app.exec_())  
+    
 
 if __name__ == "__main__":                                      
     main()

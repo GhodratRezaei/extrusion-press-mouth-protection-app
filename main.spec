@@ -8,7 +8,7 @@ a = Analysis(['main.py'],
              hiddenimports=[],
              hookspath=[], 
              runtime_hooks=[],
-             excludes=['camera.py', 'pyqt5designer', 'help', 'mouthProtectionApp_RemoteRepository_Password', '.gitignore'])  
+             excludes=['auxiliary_scripts', 'pyqt5designer', 'help', 'mouthProtectionApp_RemoteRepository_Password', '.gitignore'])  
   
 pyz = PYZ(a.pure)  
 
