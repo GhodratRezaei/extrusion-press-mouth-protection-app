@@ -1,1 +1,2 @@
-![app_screen](https://github.com/user-attachments/assets/aedea194-2b7e-4f93-a509-f51044b6e855)
+
+![mouthProtectionAppScreenUI](https://github.com/user-attachments/assets/dfa2824e-fb2d-43c6-ac9d-4f0b7dd14f8d)
