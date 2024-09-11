@@ -1350,7 +1350,7 @@ class MouthProtectionApp():
         pixmap = QPixmap.fromImage(q_img)
         self.video_label.setPixmap(pixmap)   
 
-    # Display variables Function 
+    # Display variables Function .
     def display_variables(self, reference_time):    
         pass        
         self.textEdit.setText(" Reference time:    {:.3f}\n PLC {}:    {} \n " 
